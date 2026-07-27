@@ -2,7 +2,12 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { connectDB } from '@/lib/db';
 import DashboardShell from '@/components/dashboard/DashboardShell';
-import { DashboardPage, DashboardSection, HeroCard } from '@/components/dashboard/DashboardContent';
+import {
+  DashboardPage,
+  DashboardSection,
+  HeroAsideCard,
+  HeroCard,
+} from '@/components/dashboard/DashboardContent';
 import { getBadgeDefinitions, type BadgeCatalogDefinition } from '@/lib/badge-definitions';
 import { BadgeAward } from '@/models/BadgeAward';
 import { getEventCount } from '@/lib/badge-engine';
@@ -79,19 +84,16 @@ export default async function EmployerBadgesPage() {
           description="Earning these badges signals a responsive, active, and trusted hiring pipeline to students, significantly increasing your job listing visibility."
           actions={<div />}
           aside={
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: 20,
-                padding: 24,
-                border: '1px solid rgba(255,255,255,0.14)',
+            <HeroAsideCard
+              contentStyle={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                minHeight: 172,
               }}
             >
-              <Trophy size={32} color="#60A5FA" style={{ marginBottom: 12 }} />
+              <Trophy size={32} color="#60A5FA" style={{ marginBottom: 14 }} />
               <div
                 style={{
                   fontSize: 32,
@@ -103,10 +105,17 @@ export default async function EmployerBadgesPage() {
               >
                 {totalPoints} / 100
               </div>
-              <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 600, marginTop: 4 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: 'rgba(255,255,255,0.72)',
+                  fontWeight: 700,
+                  marginTop: 6,
+                }}
+              >
                 Points Earned
               </div>
-            </div>
+            </HeroAsideCard>
           }
         />
 

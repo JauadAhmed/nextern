@@ -9,6 +9,7 @@ import {
   DashboardPage,
   DashboardSection,
   EmptyState,
+  HeroAsideCard,
   HeroCard,
   Panel,
   ProgressBar,
@@ -196,12 +197,8 @@ export default async function EmployerDashboard() {
             </>
           }
           aside={
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.14)',
-                borderRadius: 20,
-                padding: '20px 22px',
+            <HeroAsideCard
+              contentStyle={{
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 16,
@@ -373,7 +370,7 @@ export default async function EmployerDashboard() {
                   );
                 })}
               </div>
-            </div>
+            </HeroAsideCard>
           }
         />
 

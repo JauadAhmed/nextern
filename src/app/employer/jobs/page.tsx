@@ -174,12 +174,12 @@ export default async function EmployerJobsPage() {
                     {
                       label: 'Active',
                       value: stats.activeJobs,
-                      color: '#10B981',
+                      color: '#047857',
                       Icon: BriefcaseBusiness,
                     },
-                    { label: 'Total', value: stats.totalJobs, color: '#F8FAFC', Icon: BarChart3 },
-                    { label: 'Applicants', value: stats.totalApps, color: '#22D3EE', Icon: Users },
-                    { label: 'Views', value: stats.totalViews, color: '#F59E0B', Icon: Eye },
+                    { label: 'Total', value: stats.totalJobs, color: '#0F172A', Icon: BarChart3 },
+                    { label: 'Applicants', value: stats.totalApps, color: '#075985', Icon: Users },
+                    { label: 'Views', value: stats.totalViews, color: '#92400E', Icon: Eye },
                   ] as { label: string; value: number; color: string; Icon: LucideIcon }[]
                 ).map((s) => (
                   <div
@@ -204,7 +204,7 @@ export default async function EmployerJobsPage() {
                         {formatCompactNumber(s.value)}
                       </span>
                     </div>
-                    <div style={{ color: '#9FB4D0', fontSize: 12, marginTop: 7, fontWeight: 600 }}>
+                    <div style={{ color: '#FFFFFF', fontSize: 12, marginTop: 7, fontWeight: 700 }}>
                       {s.label}
                     </div>
                   </div>

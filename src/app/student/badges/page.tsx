@@ -5,7 +5,12 @@ import { Message } from '@/models/Message';
 import { Notification } from '@/models/Notification';
 import { STUDENT_NAV_ITEMS } from '@/lib/student-navigation';
 import DashboardShell from '@/components/dashboard/DashboardShell';
-import { DashboardPage, DashboardSection, HeroCard } from '@/components/dashboard/DashboardContent';
+import {
+  DashboardPage,
+  DashboardSection,
+  HeroAsideCard,
+  HeroCard,
+} from '@/components/dashboard/DashboardContent';
 import { getBadgeDefinitions, type BadgeCatalogDefinition } from '@/lib/badge-definitions';
 import { BadgeAward } from '@/models/BadgeAward';
 import { getEventCount } from '@/lib/badge-engine';
@@ -81,19 +86,16 @@ export default async function StudentBadgesPage() {
           description={`Unlock badges to earn points and elevate your platform visibility. Every badge proves your commitment to career readiness.`}
           actions={<div />}
           aside={
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: 20,
-                padding: 24,
-                border: '1px solid rgba(255,255,255,0.14)',
+            <HeroAsideCard
+              contentStyle={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                minHeight: 172,
               }}
             >
-              <Trophy size={32} color="#FDE047" style={{ marginBottom: 12 }} />
+              <Trophy size={32} color="#FDE047" style={{ marginBottom: 14 }} />
               <div
                 style={{
                   fontSize: 32,
@@ -105,10 +107,17 @@ export default async function StudentBadgesPage() {
               >
                 {totalPoints} / 100
               </div>
-              <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 600, marginTop: 4 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: 'rgba(255,255,255,0.72)',
+                  fontWeight: 700,
+                  marginTop: 6,
+                }}
+              >
                 Points Earned
               </div>
-            </div>
+            </HeroAsideCard>
           }
         />
 

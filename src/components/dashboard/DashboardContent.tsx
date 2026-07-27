@@ -12,8 +12,92 @@ const palette = {
   border: '#D9E2EC',
 };
 
+const heroAsideSurface: CSSProperties = {
+  position: 'relative',
+  overflow: 'hidden',
+  borderRadius: 24,
+  padding: 22,
+  background: 'rgba(255,255,255,0.08)',
+  border: '1px solid rgba(255,255,255,0.16)',
+  boxShadow: '0 20px 45px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.12)',
+  backdropFilter: 'blur(18px)',
+  WebkitBackdropFilter: 'blur(18px)',
+};
+
 function clamp(value: number, min = 0, max = 100) {
   return Math.min(max, Math.max(min, value));
+}
+
+function isHeroAsideStyle(style?: CSSProperties) {
+  return (
+    typeof style?.background === 'string' &&
+    style.background.includes('rgba(255,255,255') &&
+    typeof style?.border === 'string' &&
+    style.border.includes('rgba(255,255,255')
+  );
+}
+
+function HeroAsideDecorations() {
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: '0 auto 0 0',
+          width: 150,
+          background:
+            'linear-gradient(90deg, rgba(96,165,250,0.30) 0%, rgba(34,211,238,0.13) 44%, rgba(34,211,238,0) 100%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: -62,
+          right: -64,
+          width: 168,
+          height: 168,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(34,211,238,0.32), transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background:
+            'linear-gradient(100deg, rgba(42,92,224,0) 0%, rgba(42,92,224,0) 55%, rgba(42,92,224,0.28) 80%, rgba(42,92,224,0.42) 100%)',
+          pointerEvents: 'none',
+        }}
+      />
+    </>
+  );
+}
+
+export function HeroAsideCard({
+  children,
+  style,
+  contentStyle,
+}: {
+  children: ReactNode;
+  style?: CSSProperties;
+  contentStyle?: CSSProperties;
+}) {
+  return (
+    <div
+      style={{
+        ...heroAsideSurface,
+        ...style,
+      }}
+    >
+      <HeroAsideDecorations />
+      <div style={{ position: 'relative', ...contentStyle }}>{children}</div>
+    </div>
+  );
 }
 
 export function DashboardPage({ children }: { children: ReactNode }) {
@@ -340,6 +424,8 @@ export function Panel({
   children: ReactNode;
   style?: CSSProperties;
 }) {
+  const isHeroAside = isHeroAsideStyle(style);
+
   return (
     <div
       className="dashboard-panel"
@@ -350,44 +436,55 @@ export function Panel({
         padding: 22,
         boxShadow: '0 16px 34px rgba(15,23,42,0.06)',
         ...style,
+        ...(isHeroAside ? heroAsideSurface : {}),
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 14,
-          marginBottom: 18,
-          flexWrap: 'wrap',
-        }}
-      >
-        <div>
-          <h3
-            className="dashboard-panel-title"
-            style={{
-              margin: 0,
-              fontSize: 19,
-              lineHeight: 1.2,
-              fontWeight: 800,
-              color: palette.text,
-              fontFamily: 'var(--font-display)',
-            }}
-          >
-            {title}
-          </h3>
-          {description ? (
-            <p
-              className="dashboard-panel-description"
-              style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.6, color: palette.muted }}
+      {isHeroAside ? <HeroAsideDecorations /> : null}
+      <div style={isHeroAside ? { position: 'relative' } : undefined}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 14,
+            marginBottom: 18,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div>
+            <h3
+              className="dashboard-panel-title"
+              style={{
+                margin: 0,
+                fontSize: isHeroAside ? 18 : 19,
+                lineHeight: 1.2,
+                fontWeight: 800,
+                color: isHeroAside ? '#FFFFFF' : palette.text,
+                fontFamily: 'var(--font-display)',
+                letterSpacing: isHeroAside ? 0 : undefined,
+              }}
             >
-              {description}
-            </p>
-          ) : null}
+              {title}
+            </h3>
+            {description ? (
+              <p
+                className="dashboard-panel-description"
+                style={{
+                  margin: '8px 0 0',
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                  color: isHeroAside ? 'rgba(255,255,255,0.72)' : palette.muted,
+                  fontWeight: isHeroAside ? 500 : undefined,
+                }}
+              >
+                {description}
+              </p>
+            ) : null}
+          </div>
+          {action ? <div>{action}</div> : null}
         </div>
-        {action ? <div>{action}</div> : null}
+        {children}
       </div>
-      {children}
     </div>
   );
 }

@@ -271,10 +271,10 @@ export default async function ApplicantsPage({ params }: { params: Promise<{ job
             >
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
-                  { label: 'Total', value: stats.total, color: '#F8FAFC' },
-                  { label: 'Shortlisted', value: stats.shortlisted, color: '#22D3EE' },
-                  { label: 'Interviews', value: stats.interviews, color: '#F59E0B' },
-                  { label: 'Hired', value: stats.hired, color: '#10B981' },
+                  { label: 'Total', value: stats.total, color: '#0F172A' },
+                  { label: 'Shortlisted', value: stats.shortlisted, color: '#075985' },
+                  { label: 'Interviews', value: stats.interviews, color: '#92400E' },
+                  { label: 'Hired', value: stats.hired, color: '#047857' },
                 ].map((s) => (
                   <div
                     key={s.label}
@@ -296,7 +296,7 @@ export default async function ApplicantsPage({ params }: { params: Promise<{ job
                     >
                       {s.value}
                     </div>
-                    <div style={{ color: '#9FB4D0', fontSize: 12, marginTop: 4, fontWeight: 600 }}>
+                    <div style={{ color: '#FFFFFF', fontSize: 12, marginTop: 4, fontWeight: 700 }}>
                       {s.label}
                     </div>
                   </div>

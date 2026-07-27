@@ -146,10 +146,10 @@ export default async function StudentAssessmentsPage() {
             >
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
-                  { label: 'Total', value: data.stats.total, color: '#F8FAFC' },
-                  { label: 'Pending', value: data.stats.pending, color: '#22D3EE' },
-                  { label: 'Submitted', value: data.stats.submitted, color: '#F59E0B' },
-                  { label: 'Results ready', value: data.stats.graded, color: '#10B981' },
+                  { label: 'Total', value: data.stats.total, color: '#0F172A' },
+                  { label: 'Pending', value: data.stats.pending, color: '#075985' },
+                  { label: 'Submitted', value: data.stats.submitted, color: '#92400E' },
+                  { label: 'Results ready', value: data.stats.graded, color: '#047857' },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -171,7 +171,7 @@ export default async function StudentAssessmentsPage() {
                     >
                       {stat.value}
                     </div>
-                    <div style={{ color: '#9FB4D0', fontSize: 12, marginTop: 4, fontWeight: 600 }}>
+                    <div style={{ color: '#FFFFFF', fontSize: 12, marginTop: 4, fontWeight: 700 }}>
                       {stat.label}
                     </div>
                   </div>
