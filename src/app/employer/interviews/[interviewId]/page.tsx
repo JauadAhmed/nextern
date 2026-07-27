@@ -137,7 +137,7 @@ export default async function EmployerInterviewDetailPage({
                   { label: 'Recording consent', value: interview.consentStatus },
                 ].map((item) => (
                   <div key={item.label}>
-                    <div style={{ fontSize: 11, color: '#9FB4D0', fontWeight: 700 }}>
+                    <div style={{ fontSize: 11, color: '#FFFFFF', fontWeight: 700 }}>
                       {item.label}
                     </div>
                     <div style={{ marginTop: 2, fontSize: 13, color: '#FFFFFF', fontWeight: 800 }}>

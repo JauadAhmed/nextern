@@ -2,7 +2,12 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { connectDB } from '@/lib/db';
 import DashboardShell from '@/components/dashboard/DashboardShell';
-import { DashboardPage, DashboardSection, HeroCard } from '@/components/dashboard/DashboardContent';
+import {
+  DashboardPage,
+  DashboardSection,
+  HeroAsideCard,
+  HeroCard,
+} from '@/components/dashboard/DashboardContent';
 import { getBadgeDefinitions, type BadgeCatalogDefinition } from '@/lib/badge-definitions';
 import { BadgeAward } from '@/models/BadgeAward';
 import { getEventCount } from '@/lib/badge-engine';
@@ -73,19 +78,16 @@ export default async function AdvisorBadgesPage() {
           description="Earn recognition for your mentorship impact. These badges highlight your dedication to student success and career readiness guidance."
           actions={<div />}
           aside={
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: 20,
-                padding: 24,
-                border: '1px solid rgba(255,255,255,0.14)',
+            <HeroAsideCard
+              contentStyle={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                minHeight: 172,
               }}
             >
-              <Trophy size={32} color="#22D3EE" style={{ marginBottom: 12 }} />
+              <Trophy size={32} color="#22D3EE" style={{ marginBottom: 14 }} />
               <div
                 style={{
                   fontSize: 32,
@@ -100,14 +102,14 @@ export default async function AdvisorBadgesPage() {
               <div
                 style={{
                   fontSize: 13,
-                  color: '#94A3B8',
-                  fontWeight: 600,
-                  marginTop: 4,
+                  color: 'rgba(255,255,255,0.72)',
+                  fontWeight: 700,
+                  marginTop: 6,
                 }}
               >
                 Badges Unlocked
               </div>
-            </div>
+            </HeroAsideCard>
           }
         />
 

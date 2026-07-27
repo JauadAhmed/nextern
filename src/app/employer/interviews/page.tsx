@@ -142,10 +142,10 @@ export default async function EmployerInterviewsPage({
             >
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
-                  { label: 'Total', value: data.stats.total, color: '#F8FAFC' },
-                  { label: 'Scheduled', value: data.stats.scheduled, color: '#22D3EE' },
-                  { label: 'Live', value: data.stats.live, color: '#F59E0B' },
-                  { label: 'Completed', value: data.stats.completed, color: '#10B981' },
+                  { label: 'Total', value: data.stats.total, color: '#0F172A' },
+                  { label: 'Scheduled', value: data.stats.scheduled, color: '#075985' },
+                  { label: 'Live', value: data.stats.live, color: '#92400E' },
+                  { label: 'Completed', value: data.stats.completed, color: '#047857' },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -167,7 +167,7 @@ export default async function EmployerInterviewsPage({
                     >
                       {stat.value}
                     </div>
-                    <div style={{ color: '#9FB4D0', fontSize: 12, marginTop: 4, fontWeight: 600 }}>
+                    <div style={{ color: '#FFFFFF', fontSize: 12, marginTop: 4, fontWeight: 700 }}>
                       {stat.label}
                     </div>
                   </div>

@@ -121,7 +121,7 @@ export default async function StudentAssessmentDetailPage({
                   { label: 'Duration', value: `${data.assessment.durationMinutes} min` },
                 ].map((item) => (
                   <div key={item.label}>
-                    <div style={{ fontSize: 11, color: '#9FB4D0', fontWeight: 700 }}>
+                    <div style={{ fontSize: 11, color: '#FFFFFF', fontWeight: 700 }}>
                       {item.label}
                     </div>
                     <div style={{ marginTop: 2, fontSize: 13, color: '#FFFFFF', fontWeight: 800 }}>
