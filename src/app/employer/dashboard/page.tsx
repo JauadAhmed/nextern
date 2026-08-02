@@ -131,7 +131,10 @@ export default async function EmployerDashboard() {
     .map((job) => job.applicationDeadline)
     .filter((deadline): deadline is string => Boolean(deadline))
     .sort((left, right) => new Date(left).getTime() - new Date(right).getTime())[0];
-  const totalDeadlines = data.recentJobs.filter((job) => Boolean(job.applicationDeadline)).length;
+  const now = new Date();
+  const upcomingDeadlines = data.recentJobs.filter(
+    (job) => job.applicationDeadline && new Date(job.applicationDeadline) >= now
+  ).length;
   const pipelineMax = Math.max(1, ...data.pipeline.map((stage) => stage.count));
   const pipelineColors = ['#2563EB', '#22D3EE', '#F59E0B', '#10B981'];
 
@@ -306,8 +309,8 @@ export default async function EmployerDashboard() {
                     color: '#10B981',
                   },
                   {
-                    label: 'Total deadlines',
-                    value: totalDeadlines.toLocaleString(),
+                    label: 'Upcoming deadlines',
+                    value: upcomingDeadlines.toLocaleString(),
                     desc: nextDeadline
                       ? `next due ${formatShortDate(nextDeadline)}`
                       : 'no deadlines set',
