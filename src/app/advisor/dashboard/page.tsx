@@ -124,6 +124,15 @@ export default async function AdvisorDashboard() {
     { label: 'Avg Profile', value: `${data.stats.avgProfileCompleteness}%`, color: '#F59E0B' },
     { label: 'Events', value: String(totalEvents), color: '#F8FAFC' },
   ];
+  const advisorVisualMetrics = [
+    { label: 'Score', value: data.stats.avgOpportunityScore, color: '#22D3EE' },
+    { label: 'Profile', value: data.stats.avgProfileCompleteness, color: '#10B981' },
+    {
+      label: 'Quality',
+      value: Math.round((data.reputationStats.avgWorkQuality / 5) * 100),
+      color: '#F59E0B',
+    },
+  ];
 
   return (
     <DashboardShell
@@ -219,6 +228,67 @@ export default async function AdvisorDashboard() {
                         style={{ color: '#9FB4D0', fontSize: 12, marginTop: 4, fontWeight: 600 }}
                       >
                         {s.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                    gap: 10,
+                    alignItems: 'end',
+                    minHeight: 118,
+                    padding: '14px 12px 12px',
+                    borderRadius: 16,
+                    background: 'rgba(15,23,42,0.22)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                  }}
+                >
+                  {advisorVisualMetrics.map((metric) => (
+                    <div
+                      key={metric.label}
+                      style={{
+                        height: 92,
+                        display: 'grid',
+                        gridTemplateRows: '1fr auto',
+                        gap: 7,
+                        alignItems: 'end',
+                        minWidth: 0,
+                      }}
+                    >
+                      <div
+                        style={{
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'flex-end',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '100%',
+                            maxWidth: 44,
+                            height: `${Math.max(8, Math.min(metric.value, 100))}%`,
+                            borderRadius: '12px 12px 6px 6px',
+                            background: metric.color,
+                            boxShadow: `0 12px 22px ${metric.color}2E`,
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          color: '#CBD5E1',
+                          fontSize: 11,
+                          fontWeight: 800,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {metric.label}
                       </div>
                     </div>
                   ))}
@@ -613,6 +683,64 @@ export default async function AdvisorDashboard() {
               >
                 {data.topSkillGaps.length > 0 ? (
                   <>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gap: 10,
+                        marginBottom: 16,
+                        padding: 14,
+                        borderRadius: 16,
+                        background: '#F8FAFC',
+                        border: '1px solid #E2E8F0',
+                      }}
+                    >
+                      {data.topSkillGaps.slice(0, 4).map((gap, index) => {
+                        const width = Math.max(38, 100 - index * 16);
+                        const colors = ['#F59E0B', '#22D3EE', '#7C3AED', '#10B981'];
+                        const color = colors[index % colors.length];
+                        return (
+                          <div
+                            key={gap}
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'minmax(96px, 0.9fr) minmax(0, 1.4fr)',
+                              gap: 10,
+                              alignItems: 'center',
+                            }}
+                          >
+                            <div
+                              style={{
+                                color: '#475569',
+                                fontSize: 12,
+                                fontWeight: 800,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {gap}
+                            </div>
+                            <div
+                              style={{
+                                height: 10,
+                                borderRadius: 999,
+                                background: '#E2E8F0',
+                                overflow: 'hidden',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: `${width}%`,
+                                  height: '100%',
+                                  borderRadius: 999,
+                                  background: color,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {data.topSkillGaps.map((gap) => (
                         <Tag key={gap} label={gap} tone="warning" />

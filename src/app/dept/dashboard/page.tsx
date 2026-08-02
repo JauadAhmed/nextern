@@ -142,6 +142,11 @@ export default async function DeptDashboard() {
   const { deptHead, totalEvents, calendarEvents } = extras;
   const benchmark = data.department.benchmark;
   const { readinessDistribution, skillHeatmap, industryAlignment, semesterTrend } = data;
+  const readinessRing = {
+    ready: readinessDistribution.ready.pct,
+    partial: readinessDistribution.partial.pct,
+    notReady: readinessDistribution.notReady.pct,
+  };
 
   return (
     <DashboardShell
@@ -290,6 +295,99 @@ export default async function DeptDashboard() {
                       </div>
                     </div>
                   ))}
+                </div>
+                <div
+                  style={{
+                    marginTop: 4,
+                    display: 'grid',
+                    gridTemplateColumns: 'auto minmax(0, 1fr)',
+                    gap: 14,
+                    alignItems: 'center',
+                    padding: 12,
+                    borderRadius: 16,
+                    background: 'rgba(15,23,42,0.22)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                  }}
+                >
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      width: 88,
+                      height: 88,
+                      borderRadius: '50%',
+                      background: `conic-gradient(#10B981 0 ${readinessRing.ready}%, #F59E0B ${readinessRing.ready}% ${
+                        readinessRing.ready + readinessRing.partial
+                      }%, #EF4444 ${readinessRing.ready + readinessRing.partial}% 100%)`,
+                      display: 'grid',
+                      placeItems: 'center',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: '50%',
+                        background: '#0F172A',
+                        display: 'grid',
+                        placeItems: 'center',
+                        color: '#F8FAFC',
+                        fontSize: 18,
+                        fontWeight: 900,
+                        fontFamily: 'var(--font-display)',
+                      }}
+                    >
+                      {readinessRing.ready}%
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gap: 7 }}>
+                    {[
+                      { label: 'Ready', value: readinessRing.ready, color: '#10B981' },
+                      { label: 'Partial', value: readinessRing.partial, color: '#F59E0B' },
+                      { label: 'Not ready', value: readinessRing.notReady, color: '#EF4444' },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '72px 1fr 34px',
+                          gap: 8,
+                          alignItems: 'center',
+                        }}
+                      >
+                        <span style={{ color: '#CBD5E1', fontSize: 11, fontWeight: 700 }}>
+                          {item.label}
+                        </span>
+                        <span
+                          style={{
+                            height: 6,
+                            borderRadius: 999,
+                            background: 'rgba(255,255,255,0.12)',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: 'block',
+                              width: `${item.value}%`,
+                              height: '100%',
+                              borderRadius: 999,
+                              background: item.color,
+                            }}
+                          />
+                        </span>
+                        <span
+                          style={{
+                            color: item.color,
+                            fontSize: 11,
+                            fontWeight: 900,
+                            textAlign: 'right',
+                          }}
+                        >
+                          {item.value}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </Panel>

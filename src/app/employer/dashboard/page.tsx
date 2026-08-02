@@ -120,6 +120,20 @@ export default async function EmployerDashboard() {
   const profileScore = Math.round(
     (profileItems.filter(Boolean).length / profileItems.length) * 100
   );
+  const completedProfileItems = profileItems.filter(Boolean).length;
+  const recentRoleCount = data.recentJobs.length;
+  const rolesWithApplicants = data.recentJobs.filter((job) => job.applicationCount > 0).length;
+  const avgApplicantsPerActiveRole =
+    data.stats.activeJobs > 0
+      ? Math.round((data.stats.totalApplications / data.stats.activeJobs) * 10) / 10
+      : 0;
+  const nextDeadline = data.recentJobs
+    .map((job) => job.applicationDeadline)
+    .filter((deadline): deadline is string => Boolean(deadline))
+    .sort((left, right) => new Date(left).getTime() - new Date(right).getTime())[0];
+  const totalDeadlines = data.recentJobs.filter((job) => Boolean(job.applicationDeadline)).length;
+  const pipelineMax = Math.max(1, ...data.pipeline.map((stage) => stage.count));
+  const pipelineColors = ['#2563EB', '#22D3EE', '#F59E0B', '#10B981'];
 
   return (
     <DashboardShell
@@ -271,104 +285,71 @@ export default async function EmployerDashboard() {
 
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }} />
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
                   {
-                    label: 'Application → Shortlist',
-                    numerator: data.stats.shortlisted,
-                    denominator: data.stats.totalApplications,
+                    label: 'Profile fields',
+                    value: `${completedProfileItems}/4`,
+                    desc: 'core details complete',
                     color: '#22D3EE',
-                    desc: 'of applicants moved to review',
                   },
                   {
-                    label: 'Shortlist → Interview',
-                    numerator: data.stats.interviews,
-                    denominator: data.stats.shortlisted,
+                    label: 'Avg per active role',
+                    value: avgApplicantsPerActiveRole.toLocaleString(),
+                    desc: 'applicant density',
                     color: '#F59E0B',
-                    desc: 'of shortlisted reached interview',
                   },
                   {
-                    label: 'Interview → Hire',
-                    numerator: data.stats.hired,
-                    denominator: data.stats.interviews,
+                    label: 'Roles with traction',
+                    value: recentRoleCount ? `${rolesWithApplicants}/${recentRoleCount}` : '0',
+                    desc: 'recent roles drawing interest',
                     color: '#10B981',
-                    desc: 'of interviews resulted in hire',
                   },
                   {
-                    label: 'Overall hire rate',
-                    numerator: data.stats.hired,
-                    denominator: data.stats.totalApplications,
+                    label: 'Total deadlines',
+                    value: totalDeadlines.toLocaleString(),
+                    desc: nextDeadline
+                      ? `next due ${formatShortDate(nextDeadline)}`
+                      : 'no deadlines set',
                     color: '#A78BFA',
-                    desc: 'of all applicants were hired',
                   },
-                ].map((metric) => {
-                  const pct =
-                    metric.denominator > 0
-                      ? Math.round((metric.numerator / metric.denominator) * 100)
-                      : 0;
-                  return (
-                    <div key={metric.label}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          marginBottom: 5,
-                        }}
-                      >
-                        <div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#CBD5E1' }}>
-                            {metric.label}
-                          </div>
-                          <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>
-                            {metric.desc}
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'baseline',
-                            gap: 3,
-                            flexShrink: 0,
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: 16,
-                              fontWeight: 900,
-                              color: metric.color,
-                              fontFamily: 'var(--font-display)',
-                              lineHeight: 1,
-                            }}
-                          >
-                            {pct}%
-                          </div>
-                          <div style={{ fontSize: 10, color: '#475569' }}>
-                            ({metric.numerator}/{metric.denominator})
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          height: 6,
-                          background: 'rgba(255,255,255,0.1)',
-                          borderRadius: 999,
-                          overflow: 'hidden',
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: `${pct}%`,
-                            height: '100%',
-                            background: metric.color,
-                            borderRadius: 999,
-                            transition: 'width 0.4s',
-                          }}
-                        />
-                      </div>
+                ].map((metric) => (
+                  <div
+                    key={metric.label}
+                    style={{
+                      minHeight: 86,
+                      padding: '12px 14px',
+                      borderRadius: 14,
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        color: metric.color,
+                        fontSize: 20,
+                        fontWeight: 900,
+                        lineHeight: 1.05,
+                        fontFamily: 'var(--font-display)',
+                      }}
+                    >
+                      {metric.value}
                     </div>
-                  );
-                })}
+                    <div
+                      style={{
+                        marginTop: 8,
+                        color: '#E2E8F0',
+                        fontSize: 12,
+                        fontWeight: 800,
+                      }}
+                    >
+                      {metric.label}
+                    </div>
+                    <div style={{ marginTop: 3, color: '#94A3B8', fontSize: 10, fontWeight: 600 }}>
+                      {metric.desc}
+                    </div>
+                  </div>
+                ))}
               </div>
             </HeroAsideCard>
           }
@@ -590,70 +571,95 @@ export default async function EmployerDashboard() {
               description="Distribution of application volume moving through each hiring stage."
             >
               <div style={{ display: 'grid', gap: 12 }}>
-                {data.pipeline.map((stage, i) => {
-                  const total = data.stats.totalApplications;
-                  const pct = total > 0 ? Math.round((stage.count / total) * 100) : 0;
-                  const colors = ['#2563EB', '#22D3EE', '#F59E0B', '#10B981'];
-                  const color = colors[i % colors.length];
-                  return (
-                    <div
-                      key={stage.label}
-                      style={{
-                        padding: '14px 16px',
-                        borderRadius: 16,
-                        border: '1px solid #E2E8F0',
-                        background: '#F8FAFC',
-                      }}
-                    >
+                <div
+                  style={{
+                    minHeight: 210,
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${data.pipeline.length || 1}, minmax(0, 1fr))`,
+                    gap: 14,
+                    alignItems: 'end',
+                    padding: '20px 18px 16px',
+                    borderRadius: 18,
+                    background: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                  }}
+                >
+                  {data.pipeline.map((stage, i) => {
+                    const color = pipelineColors[i % pipelineColors.length];
+                    const total = data.stats.totalApplications;
+                    const pct = total > 0 ? Math.round((stage.count / total) * 100) : 0;
+                    const height =
+                      stage.count > 0 ? Math.max(18, (stage.count / pipelineMax) * 100) : 6;
+                    return (
                       <div
+                        key={stage.label}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          marginBottom: 10,
+                          minHeight: 174,
+                          minWidth: 0,
+                          display: 'grid',
+                          gridTemplateRows: 'auto 1fr auto',
+                          gap: 10,
                         }}
                       >
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#1E293B' }}>
-                          {stage.label}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                        <div style={{ textAlign: 'center' }}>
                           <div
                             style={{
-                              fontSize: 26,
-                              fontWeight: 900,
                               color,
-                              fontFamily: 'var(--font-display)',
+                              fontSize: 24,
+                              fontWeight: 900,
                               lineHeight: 1,
+                              fontFamily: 'var(--font-display)',
                             }}
                           >
                             {formatCompactNumber(stage.count)}
                           </div>
-                          <div style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600 }}>
-                            {pct}%
+                          <div
+                            style={{
+                              marginTop: 4,
+                              color: '#64748B',
+                              fontSize: 11,
+                              fontWeight: 800,
+                            }}
+                          >
+                            {pct}% of total
                           </div>
                         </div>
-                      </div>
-                      <div
-                        style={{
-                          height: 6,
-                          background: '#E2E8F0',
-                          borderRadius: 999,
-                          overflow: 'hidden',
-                        }}
-                      >
                         <div
                           style={{
-                            width: `${pct}%`,
                             height: '100%',
-                            background: color,
-                            borderRadius: 999,
-                            transition: 'width 0.4s ease',
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            justifyContent: 'center',
                           }}
-                        />
+                        >
+                          <div
+                            style={{
+                              width: '100%',
+                              maxWidth: 56,
+                              height: `${height}%`,
+                              borderRadius: '14px 14px 6px 6px',
+                              background: color,
+                              boxShadow: `0 12px 24px ${color}26`,
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            textAlign: 'center',
+                            color: '#64748B',
+                            fontSize: 11,
+                            fontWeight: 800,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {stage.label}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </Panel>
 
