@@ -8,6 +8,7 @@ import Link from 'next/link';
 import ApplicantActions from './ApplicantActions';
 import HiringSuiteBatchActions from './HiringSuiteBatchActions';
 import { formatDhakaDateTime } from '@/lib/datetime';
+import PaginatedCollection from '@/components/ui/PaginatedCollection';
 import {
   CalendarClock,
   ChevronDown,
@@ -212,7 +213,7 @@ function UniversityRow({
                 style={{
                   width: `${pct}%`,
                   height: '100%',
-                  background: 'linear-gradient(90deg, #2563EB, #22D3EE)',
+                  background: '#2563EB',
                   borderRadius: 999,
                 }}
               />
@@ -485,7 +486,7 @@ function ApplicantCard({
           width: 42,
           height: 42,
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, #2563EB, #7C3AED)',
+          background: '#2563EB',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -610,7 +611,7 @@ function ApplicantCard({
                   ? `Due ${formatMetaDate(app.assessment.dueAt)}`
                   : 'Assigned from the hiring suite.'}
               {typeof app.assessment?.passed === 'boolean'
-                ? ` Â· ${app.assessment.passed ? 'Passed' : 'Pending review'}`
+                ? ` · ${app.assessment.passed ? 'Passed' : 'Pending review'}`
                 : ''}
             </div>
           </div>
@@ -734,7 +735,7 @@ function ApplicantCard({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 5,
-            background: 'linear-gradient(135deg, #7C3AED, #6D28D9)',
+            background: '#7C3AED',
             color: '#fff',
             padding: '7px 13px',
             borderRadius: 9,
@@ -946,7 +947,7 @@ export default function BatchHiringPanel({
                   width: 36,
                   height: 36,
                   borderRadius: 10,
-                  background: 'linear-gradient(135deg, #2563EB, #7C3AED)',
+                  background: '#2563EB',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1199,7 +1200,7 @@ export default function BatchHiringPanel({
       <div
         id="ai-shortlist"
         style={{
-          background: 'linear-gradient(135deg, #0F172A, #1E293B)',
+          background: '#172033',
           borderRadius: 20,
           border: '1px solid rgba(37,99,235,0.32)',
           overflow: 'hidden',
@@ -1223,7 +1224,7 @@ export default function BatchHiringPanel({
                 width: 42,
                 height: 42,
                 borderRadius: 14,
-                background: 'linear-gradient(135deg, #2563EB, #22D3EE)',
+                background: '#2563EB',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1298,9 +1299,7 @@ export default function BatchHiringPanel({
                   alignItems: 'center',
                   gap: 7,
                   background:
-                    aiLoading || applications.length === 0
-                      ? 'rgba(148,163,184,0.24)'
-                      : 'linear-gradient(135deg, #2563EB, #22D3EE)',
+                    aiLoading || applications.length === 0 ? 'rgba(148,163,184,0.24)' : '#2563EB',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: 12,
@@ -1645,10 +1644,7 @@ export default function BatchHiringPanel({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 5,
-                    background:
-                      !batchStatus || batchSaving
-                        ? '#F1F5F9'
-                        : 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                    background: !batchStatus || batchSaving ? '#F1F5F9' : '#2563EB',
                     color: !batchStatus || batchSaving ? '#94A3B8' : '#fff',
                     border: 'none',
                     borderRadius: 8,
@@ -1689,7 +1685,7 @@ export default function BatchHiringPanel({
         </div>
 
         {/* Applicant list */}
-        <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ padding: '16px 24px' }}>
           {filteredApps.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: '#94A3B8' }}>
               <Users size={32} style={{ margin: '0 auto 12px', display: 'block', opacity: 0.4 }} />
@@ -1701,15 +1697,21 @@ export default function BatchHiringPanel({
               </div>
             </div>
           ) : (
-            filteredApps.map((app) => (
-              <ApplicantCard
-                key={app._id}
-                app={app}
-                jobId={jobId}
-                selected={selectedApps.has(app._id)}
-                onSelect={toggleSelect}
-              />
-            ))
+            <PaginatedCollection
+              itemLabel="applicants"
+              resetKey={activeTab}
+              style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+            >
+              {filteredApps.map((app) => (
+                <ApplicantCard
+                  key={app._id}
+                  app={app}
+                  jobId={jobId}
+                  selected={selectedApps.has(app._id)}
+                  onSelect={toggleSelect}
+                />
+              ))}
+            </PaginatedCollection>
           )}
         </div>
       </div>

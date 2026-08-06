@@ -70,7 +70,7 @@ export default function EmployerPremiumClient({
     return (
       <div
         style={{
-          background: 'linear-gradient(145deg, #1E293B, #0F172A)',
+          background: '#172033',
           borderRadius: 24,
           padding: 40,
           textAlign: 'center',
@@ -89,7 +89,7 @@ export default function EmployerPremiumClient({
         >
           You&apos;re on Premium
         </h2>
-        <p style={{ color: '#64748B', fontSize: 15, marginBottom: 24 }}>
+        <p style={{ color: '#B8C5D6', fontSize: 15, marginBottom: 24 }}>
           All premium hiring features are active on your account.
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -174,7 +174,7 @@ export default function EmployerPremiumClient({
       >
         <div
           style={{
-            background: 'linear-gradient(145deg, #1E293B, #0F172A)',
+            background: '#172033',
             borderRadius: 24,
             padding: 32,
             border: '1px solid rgba(37,99,235,0.25)',
@@ -189,7 +189,7 @@ export default function EmployerPremiumClient({
               right: -50,
               width: 180,
               height: 180,
-              background: 'radial-gradient(circle, rgba(37,99,235,0.18), transparent 70%)',
+              background: 'rgba(37,99,235,0.11)',
               borderRadius: '50%',
             }}
           />
@@ -208,7 +208,7 @@ export default function EmployerPremiumClient({
             >
               {plan.name}
             </h2>
-            <p style={{ color: '#64748B', fontSize: 15, marginBottom: 16 }}>{plan.tagline}</p>
+            <p style={{ color: '#B8C5D6', fontSize: 15, marginBottom: 16 }}>{plan.tagline}</p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span
                 style={{
@@ -221,7 +221,7 @@ export default function EmployerPremiumClient({
               >
                 ৳{plan.price}
               </span>
-              <span style={{ color: '#64748B', fontSize: 14 }}>/month</span>
+              <span style={{ color: '#B8C5D6', fontSize: 14 }}>/month</span>
             </div>
           </div>
 

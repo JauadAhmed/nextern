@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
         display: 'grid',
         placeItems: 'center',
         padding: '32px 18px',
-        background: 'linear-gradient(145deg, #F8FAFC 0%, #EFF6FF 100%)',
+        background: '#F8FAFC',
       }}
     >
       <section

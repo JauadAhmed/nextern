@@ -202,7 +202,7 @@ export default function HiringSuiteBatchActions({ jobId, selectedApplications }:
           style={{
             padding: '18px 20px',
             borderBottom: '1px solid #DBEAFE',
-            background: 'linear-gradient(135deg, #EFF6FF, #F8FAFC)',
+            background: '#EFF6FF',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -211,7 +211,7 @@ export default function HiringSuiteBatchActions({ jobId, selectedApplications }:
                 width: 42,
                 height: 42,
                 borderRadius: 14,
-                background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                background: '#2563EB',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -311,7 +311,7 @@ export default function HiringSuiteBatchActions({ jobId, selectedApplications }:
                 background:
                   !assessmentId || selectedIds.length === 0 || assessmentLoading
                     ? '#E2E8F0'
-                    : 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                    : '#2563EB',
                 color:
                   !assessmentId || selectedIds.length === 0 || assessmentLoading
                     ? '#64748B'
@@ -376,7 +376,7 @@ export default function HiringSuiteBatchActions({ jobId, selectedApplications }:
           style={{
             padding: '18px 20px',
             borderBottom: '1px solid #E9D5FF',
-            background: 'linear-gradient(135deg, #F5F3FF, #F8FAFC)',
+            background: '#F5F3FF',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -385,7 +385,7 @@ export default function HiringSuiteBatchActions({ jobId, selectedApplications }:
                 width: 42,
                 height: 42,
                 borderRadius: 14,
-                background: 'linear-gradient(135deg, #7C3AED, #6D28D9)',
+                background: '#7C3AED',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -501,7 +501,7 @@ export default function HiringSuiteBatchActions({ jobId, selectedApplications }:
                 background:
                   !scheduledAt || selectedIds.length === 0 || interviewLoading
                     ? '#E2E8F0'
-                    : 'linear-gradient(135deg, #7C3AED, #6D28D9)',
+                    : '#7C3AED',
                 color:
                   !scheduledAt || selectedIds.length === 0 || interviewLoading
                     ? '#64748B'

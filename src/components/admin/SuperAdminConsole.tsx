@@ -41,6 +41,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import PaginationControls from '@/components/ui/PaginationControls';
+import { NexternLogoMark } from '@/components/brand/NexternLogo';
 import styles from './SuperAdminConsole.module.css';
 
 type SectionKey =
@@ -291,6 +293,7 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
   const [verificationFilters, setVerificationFilters] = useState({ role: 'all', search: '' });
   const [verificationData, setVerificationData] = useState<any>(null);
   const [verificationLoading, setVerificationLoading] = useState(false);
+  const [verificationPagination, setVerificationPagination] = useState({ page: 1, pageSize: 24 });
   const [reviewNote, setReviewNote] = useState<Record<string, string>>({});
   const [reviewActionId, setReviewActionId] = useState<string | null>(null);
 
@@ -303,6 +306,7 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
   });
   const [usersData, setUsersData] = useState<any>(null);
   const [usersLoading, setUsersLoading] = useState(false);
+  const [usersPagination, setUsersPagination] = useState({ page: 1, pageSize: 24 });
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [userForm, setUserForm] = useState<any>(null);
   const [userSaving, setUserSaving] = useState(false);
@@ -315,6 +319,7 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
   });
   const [jobsData, setJobsData] = useState<any>(null);
   const [jobsLoading, setJobsLoading] = useState(false);
+  const [jobsPagination, setJobsPagination] = useState({ page: 1, pageSize: 24 });
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [jobForm, setJobForm] = useState<any>(null);
   const [jobSaving, setJobSaving] = useState(false);
@@ -326,6 +331,10 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
   });
   const [applicationsData, setApplicationsData] = useState<any>(null);
   const [applicationsLoading, setApplicationsLoading] = useState(false);
+  const [applicationsPagination, setApplicationsPagination] = useState({
+    page: 1,
+    pageSize: 24,
+  });
   const [selectedApplication, setSelectedApplication] = useState<any>(null);
   const [applicationForm, setApplicationForm] = useState<any>(null);
   const [applicationSaving, setApplicationSaving] = useState(false);
@@ -546,12 +555,16 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
     }
   }
 
-  async function loadVerification() {
+  async function loadVerification(
+    nextPage = verificationPagination.page,
+    nextPageSize = verificationPagination.pageSize
+  ) {
     setVerificationLoading(true);
     try {
       const params = new URLSearchParams({
         status: 'pending',
-        limit: '20',
+        page: String(nextPage),
+        limit: String(nextPageSize),
         role: verificationFilters.role,
       });
       if (verificationFilters.search.trim())
@@ -564,10 +577,16 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
     }
   }
 
-  async function loadUsers() {
+  async function loadUsers(
+    nextPage = usersPagination.page,
+    nextPageSize = usersPagination.pageSize
+  ) {
     setUsersLoading(true);
     try {
-      const params = new URLSearchParams({ limit: '20' });
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        limit: String(nextPageSize),
+      });
       if (userFilters.role !== 'all') params.set('role', userFilters.role);
       if (userFilters.status !== 'all') params.set('status', userFilters.status);
       if (userFilters.premium !== 'all') params.set('premium', userFilters.premium);
@@ -582,10 +601,13 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
     }
   }
 
-  async function loadJobs() {
+  async function loadJobs(nextPage = jobsPagination.page, nextPageSize = jobsPagination.pageSize) {
     setJobsLoading(true);
     try {
-      const params = new URLSearchParams({ limit: '20' });
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        limit: String(nextPageSize),
+      });
       if (jobFilters.type !== 'all') params.set('type', jobFilters.type);
       if (jobFilters.active !== 'all') params.set('active', jobFilters.active);
       if (jobFilters.premium !== 'all') params.set('premium', jobFilters.premium);
@@ -598,10 +620,16 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
     }
   }
 
-  async function loadApplications() {
+  async function loadApplications(
+    nextPage = applicationsPagination.page,
+    nextPageSize = applicationsPagination.pageSize
+  ) {
     setApplicationsLoading(true);
     try {
-      const params = new URLSearchParams({ limit: '20' });
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        limit: String(nextPageSize),
+      });
       if (applicationFilters.status !== 'all') params.set('status', applicationFilters.status);
       if (applicationFilters.eventRegistration !== 'all') {
         params.set('eventRegistration', applicationFilters.eventRegistration);
@@ -1109,7 +1137,7 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
       <div className={styles.shell}>
         <aside className={styles.sidebar}>
           <div className={styles.brandBlock}>
-            <div className={styles.brandMark}>N</div>
+            <NexternLogoMark size={42} radius={14} priority />
             <div>
               <div className={styles.brandEyebrow}>Nextern Control</div>
               <div className={styles.brandTitle}>Superadmin Workspace</div>
@@ -1567,7 +1595,10 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                   </div>
                   <button
                     className={styles.primaryButton}
-                    onClick={() => void loadVerification()}
+                    onClick={() => {
+                      setVerificationPagination((current) => ({ ...current, page: 1 }));
+                      void loadVerification(1, verificationPagination.pageSize);
+                    }}
                     type="button"
                   >
                     <Search size={14} />
@@ -1658,6 +1689,22 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                     description="No registrations match the current filters."
                   />
                 )}
+                {!verificationLoading && verificationData?.pagination?.total > 0 ? (
+                  <PaginationControls
+                    page={verificationPagination.page}
+                    pageSize={verificationPagination.pageSize}
+                    totalItems={verificationData.pagination.total}
+                    itemLabel="verification requests"
+                    onPageChange={(page) => {
+                      setVerificationPagination((current) => ({ ...current, page }));
+                      void loadVerification(page, verificationPagination.pageSize);
+                    }}
+                    onPageSizeChange={(pageSize) => {
+                      setVerificationPagination({ page: 1, pageSize });
+                      void loadVerification(1, pageSize);
+                    }}
+                  />
+                ) : null}
               </div>
             </section>
           ) : null}
@@ -1721,7 +1768,10 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                   </div>
                   <button
                     className={styles.primaryButton}
-                    onClick={() => void loadUsers()}
+                    onClick={() => {
+                      setUsersPagination((current) => ({ ...current, page: 1 }));
+                      void loadUsers(1, usersPagination.pageSize);
+                    }}
                     type="button"
                   >
                     <Search size={14} />
@@ -1807,6 +1857,22 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                     description="Adjust the filters to see more accounts."
                   />
                 )}
+                {!usersLoading && usersData?.pagination?.total > 0 ? (
+                  <PaginationControls
+                    page={usersPagination.page}
+                    pageSize={usersPagination.pageSize}
+                    totalItems={usersData.pagination.total}
+                    itemLabel="users"
+                    onPageChange={(page) => {
+                      setUsersPagination((current) => ({ ...current, page }));
+                      void loadUsers(page, usersPagination.pageSize);
+                    }}
+                    onPageSizeChange={(pageSize) => {
+                      setUsersPagination({ page: 1, pageSize });
+                      void loadUsers(1, pageSize);
+                    }}
+                  />
+                ) : null}
               </div>
 
               {selectedUser && userForm ? (
@@ -2109,7 +2175,10 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                   </div>
                   <button
                     className={styles.primaryButton}
-                    onClick={() => void loadJobs()}
+                    onClick={() => {
+                      setJobsPagination((current) => ({ ...current, page: 1 }));
+                      void loadJobs(1, jobsPagination.pageSize);
+                    }}
                     type="button"
                   >
                     <Search size={14} />
@@ -2192,6 +2261,22 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                     description="Try broadening the job filters."
                   />
                 )}
+                {!jobsLoading && jobsData?.pagination?.total > 0 ? (
+                  <PaginationControls
+                    page={jobsPagination.page}
+                    pageSize={jobsPagination.pageSize}
+                    totalItems={jobsData.pagination.total}
+                    itemLabel="job listings"
+                    onPageChange={(page) => {
+                      setJobsPagination((current) => ({ ...current, page }));
+                      void loadJobs(page, jobsPagination.pageSize);
+                    }}
+                    onPageSizeChange={(pageSize) => {
+                      setJobsPagination({ page: 1, pageSize });
+                      void loadJobs(1, pageSize);
+                    }}
+                  />
+                ) : null}
               </div>
 
               {selectedJob && jobForm ? (
@@ -2407,7 +2492,10 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                   </div>
                   <button
                     className={styles.primaryButton}
-                    onClick={() => void loadApplications()}
+                    onClick={() => {
+                      setApplicationsPagination((current) => ({ ...current, page: 1 }));
+                      void loadApplications(1, applicationsPagination.pageSize);
+                    }}
                     type="button"
                   >
                     <Search size={14} />
@@ -2504,6 +2592,22 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                     description="No submissions match the current filters."
                   />
                 )}
+                {!applicationsLoading && applicationsData?.pagination?.total > 0 ? (
+                  <PaginationControls
+                    page={applicationsPagination.page}
+                    pageSize={applicationsPagination.pageSize}
+                    totalItems={applicationsData.pagination.total}
+                    itemLabel="applications"
+                    onPageChange={(page) => {
+                      setApplicationsPagination((current) => ({ ...current, page }));
+                      void loadApplications(page, applicationsPagination.pageSize);
+                    }}
+                    onPageSizeChange={(pageSize) => {
+                      setApplicationsPagination({ page: 1, pageSize });
+                      void loadApplications(1, pageSize);
+                    }}
+                  />
+                ) : null}
               </div>
 
               {selectedApplication && applicationForm ? (

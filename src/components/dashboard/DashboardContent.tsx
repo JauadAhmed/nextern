@@ -3,11 +3,11 @@ import type { LucideIcon } from 'lucide-react';
 
 const palette = {
   primary: '#2563EB',
-  indigo: '#1E293B',
-  cyan: '#22D3EE',
-  text: '#1E293B',
-  muted: '#64748B',
-  success: '#10B981',
+  indigo: '#172033',
+  cyan: '#0891B2',
+  text: '#172033',
+  muted: '#52657A',
+  success: '#059669',
   warning: '#F59E0B',
   border: '#D9E2EC',
 };
@@ -15,13 +15,11 @@ const palette = {
 const heroAsideSurface: CSSProperties = {
   position: 'relative',
   overflow: 'hidden',
-  borderRadius: 24,
+  borderRadius: 20,
   padding: 22,
   background: 'rgba(255,255,255,0.08)',
   border: '1px solid rgba(255,255,255,0.16)',
-  boxShadow: '0 20px 45px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.12)',
-  backdropFilter: 'blur(18px)',
-  WebkitBackdropFilter: 'blur(18px)',
+  boxShadow: '0 14px 32px rgba(15,23,42,0.14)',
 };
 
 function clamp(value: number, min = 0, max = 100) {
@@ -45,9 +43,8 @@ function HeroAsideDecorations() {
         style={{
           position: 'absolute',
           inset: '0 auto 0 0',
-          width: 150,
-          background:
-            'linear-gradient(90deg, rgba(96,165,250,0.30) 0%, rgba(34,211,238,0.13) 44%, rgba(34,211,238,0) 100%)',
+          width: 8,
+          background: 'rgba(125,211,252,0.72)',
           pointerEvents: 'none',
         }}
       />
@@ -55,12 +52,12 @@ function HeroAsideDecorations() {
         aria-hidden="true"
         style={{
           position: 'absolute',
-          top: -62,
-          right: -64,
-          width: 168,
-          height: 168,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(34,211,238,0.32), transparent 70%)',
+          top: 0,
+          right: 0,
+          width: 84,
+          height: 84,
+          borderRadius: '0 0 0 84px',
+          background: 'rgba(125,211,252,0.12)',
           pointerEvents: 'none',
         }}
       />
@@ -68,9 +65,10 @@ function HeroAsideDecorations() {
         aria-hidden="true"
         style={{
           position: 'absolute',
-          inset: 0,
-          background:
-            'linear-gradient(100deg, rgba(42,92,224,0) 0%, rgba(42,92,224,0) 55%, rgba(42,92,224,0.28) 80%, rgba(42,92,224,0.42) 100%)',
+          inset: 'auto 0 0 auto',
+          width: 120,
+          height: 5,
+          background: 'rgba(255,255,255,0.16)',
           pointerEvents: 'none',
         }}
       />
@@ -195,11 +193,10 @@ export function HeroCard({
       style={{
         position: 'relative',
         overflow: 'hidden',
-        borderRadius: 28,
+        borderRadius: 24,
         padding: 28,
-        background:
-          'linear-gradient(135deg, rgba(30,41,59,0.98), rgba(37,99,235,0.94) 62%, rgba(34,211,238,0.9))',
-        boxShadow: '0 26px 60px rgba(15,23,42,0.16)',
+        background: '#234A8A',
+        boxShadow: '0 20px 48px rgba(15,23,42,0.14)',
       }}
     >
       <div
@@ -209,8 +206,7 @@ export function HeroCard({
           width: 260,
           height: 260,
           borderRadius: '50%',
-          background: 'rgba(255,255,255,0.1)',
-          filter: 'blur(8px)',
+          background: 'rgba(125,211,252,0.12)',
         }}
       />
       <div
@@ -260,7 +256,10 @@ export function HeroCard({
 
           {/* ── Subtitle — shown under name, above description ── */}
           {subtitle ? (
-            <div className="dashboard-hero-subtitle" style={{ marginTop: 12 }}>
+            <div
+              className="dashboard-hero-subtitle"
+              style={{ marginTop: 12, color: '#DCEBFF', fontSize: 14, fontWeight: 700 }}
+            >
               {subtitle}
             </div>
           ) : null}
@@ -312,7 +311,8 @@ export function ActionLink({
         alignItems: 'center',
         justifyContent: 'center',
         padding: '12px 16px',
-        borderRadius: 14,
+        minHeight: 44,
+        borderRadius: 12,
         textDecoration: 'none',
         fontSize: 14,
         fontWeight: 700,
@@ -346,11 +346,11 @@ export function StatCard({
     <div
       className="dashboard-stat-card"
       style={{
-        borderRadius: 22,
+        borderRadius: 18,
         background: '#FFFFFF',
         border: `1px solid ${palette.border}`,
         padding: 20,
-        boxShadow: '0 16px 32px rgba(15,23,42,0.06)',
+        boxShadow: '0 10px 28px rgba(15,23,42,0.055)',
       }}
     >
       {showIcon ? (
@@ -430,11 +430,11 @@ export function Panel({
     <div
       className="dashboard-panel"
       style={{
-        borderRadius: 24,
+        borderRadius: 20,
         background: '#FFFFFF',
         border: `1px solid ${palette.border}`,
         padding: 22,
-        boxShadow: '0 16px 34px rgba(15,23,42,0.06)',
+        boxShadow: '0 10px 28px rgba(15,23,42,0.055)',
         ...style,
         ...(isHeroAside ? heroAsideSurface : {}),
       }}
@@ -473,7 +473,7 @@ export function Panel({
                   margin: '8px 0 0',
                   fontSize: 13,
                   lineHeight: 1.6,
-                  color: isHeroAside ? 'rgba(255,255,255,0.72)' : palette.muted,
+                  color: isHeroAside ? '#DCEBFF' : palette.muted,
                   fontWeight: isHeroAside ? 500 : undefined,
                 }}
               >
@@ -535,9 +535,9 @@ export function ProgressBar({
   tone?: 'primary' | 'success' | 'warning';
 }) {
   const colors = {
-    primary: 'linear-gradient(90deg, #2563EB, #22D3EE)',
-    success: 'linear-gradient(90deg, #059669, #10B981)',
-    warning: 'linear-gradient(90deg, #F59E0B, #FBBF24)',
+    primary: '#2563EB',
+    success: '#059669',
+    warning: '#D97706',
   };
 
   return (

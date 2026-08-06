@@ -7,6 +7,7 @@ import { Message } from '@/models/Message';
 import { User } from '@/models/User';
 import { STUDENT_NAV_ITEMS } from '@/lib/student-navigation';
 import DashboardShell from '@/components/dashboard/DashboardShell';
+import PaginatedCollection from '@/components/ui/PaginatedCollection';
 import {
   ActionLink,
   DashboardPage,
@@ -121,10 +122,10 @@ export default async function StudentInterviewsPage() {
             >
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
-                  { label: 'Total', value: data.stats.total, color: '#0F172A' },
-                  { label: 'Scheduled', value: data.stats.scheduled, color: '#075985' },
-                  { label: 'Live', value: data.stats.live, color: '#92400E' },
-                  { label: 'Completed', value: data.stats.completed, color: '#047857' },
+                  { label: 'Total', value: data.stats.total, color: '#FFFFFF' },
+                  { label: 'Scheduled', value: data.stats.scheduled, color: '#BAE6FD' },
+                  { label: 'Live', value: data.stats.live, color: '#FDE68A' },
+                  { label: 'Completed', value: data.stats.completed, color: '#A7F3D0' },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -204,95 +205,97 @@ export default async function StudentInterviewsPage() {
                 pipeline, it will appear here and in your application tracker automatically.
               </div>
             ) : (
-              data.interviews.map((interview) => (
-                <div
-                  key={interview._id}
-                  style={{
-                    background: '#FFFFFF',
-                    borderRadius: 20,
-                    border: '1px solid #D9E2EC',
-                    boxShadow: '0 12px 28px rgba(15,23,42,0.05)',
-                    padding: 18,
-                    display: 'grid',
-                    gap: 10,
-                  }}
-                >
+              <PaginatedCollection itemLabel="interviews" style={{ display: 'grid', gap: 14 }}>
+                {data.interviews.map((interview) => (
                   <div
+                    key={interview._id}
                     style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      justifyContent: 'space-between',
-                      gap: 12,
-                      flexWrap: 'wrap',
+                      background: '#FFFFFF',
+                      borderRadius: 20,
+                      border: '1px solid #D9E2EC',
+                      boxShadow: '0 12px 28px rgba(15,23,42,0.05)',
+                      padding: 18,
+                      display: 'grid',
+                      gap: 10,
                     }}
                   >
-                    <div>
-                      <div
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        gap: 12,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <div>
+                        <div
+                          style={{
+                            fontSize: 17,
+                            fontWeight: 900,
+                            color: '#0F172A',
+                            fontFamily: 'var(--font-display)',
+                          }}
+                        >
+                          {interview.title}
+                        </div>
+                        <div style={{ marginTop: 4, fontSize: 13, color: '#64748B' }}>
+                          {interview.job?.title ?? 'Role'} •{' '}
+                          {interview.job?.companyName ?? 'Employer'}
+                        </div>
+                      </div>
+                      <span
                         style={{
-                          fontSize: 17,
-                          fontWeight: 900,
-                          color: '#0F172A',
-                          fontFamily: 'var(--font-display)',
+                          borderRadius: 999,
+                          padding: '6px 10px',
+                          background: '#F5F3FF',
+                          border: '1px solid #DDD6FE',
+                          color: '#7C3AED',
+                          fontSize: 12,
+                          fontWeight: 800,
                         }}
                       >
-                        {interview.title}
-                      </div>
-                      <div style={{ marginTop: 4, fontSize: 13, color: '#64748B' }}>
-                        {interview.job?.title ?? 'Role'} •{' '}
-                        {interview.job?.companyName ?? 'Employer'}
-                      </div>
+                        {interview.status.replace('_', ' ')}
+                      </span>
                     </div>
-                    <span
+
+                    <div
                       style={{
-                        borderRadius: 999,
-                        padding: '6px 10px',
-                        background: '#F5F3FF',
-                        border: '1px solid #DDD6FE',
-                        color: '#7C3AED',
+                        display: 'flex',
+                        gap: 18,
+                        flexWrap: 'wrap',
                         fontSize: 12,
-                        fontWeight: 800,
+                        color: '#64748B',
                       }}
                     >
-                      {interview.status.replace('_', ' ')}
-                    </span>
-                  </div>
+                      <span>{formatDateTime(interview.scheduledAt)}</span>
+                      <span>{interview.durationMinutes} min</span>
+                      <span>{interview.mode === 'panel' ? 'Panel interview' : 'One-on-one'}</span>
+                      <span>Recording consent: {interview.consentStatus}</span>
+                    </div>
 
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: 18,
-                      flexWrap: 'wrap',
-                      fontSize: 12,
-                      color: '#64748B',
-                    }}
-                  >
-                    <span>{formatDateTime(interview.scheduledAt)}</span>
-                    <span>{interview.durationMinutes} min</span>
-                    <span>{interview.mode === 'panel' ? 'Panel interview' : 'One-on-one'}</span>
-                    <span>Recording consent: {interview.consentStatus}</span>
+                    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                      <Link
+                        href={`/student/interviews/${interview._id}`}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          background: '#0F172A',
+                          color: '#FFFFFF',
+                          borderRadius: 12,
+                          padding: '10px 14px',
+                          fontSize: 12,
+                          fontWeight: 800,
+                          textDecoration: 'none',
+                        }}
+                      >
+                        Open session
+                      </Link>
+                    </div>
                   </div>
-
-                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                    <Link
-                      href={`/student/interviews/${interview._id}`}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        background: '#0F172A',
-                        color: '#FFFFFF',
-                        borderRadius: 12,
-                        padding: '10px 14px',
-                        fontSize: 12,
-                        fontWeight: 800,
-                        textDecoration: 'none',
-                      }}
-                    >
-                      Open session
-                    </Link>
-                  </div>
-                </div>
-              ))
+                ))}
+              </PaginatedCollection>
             )}
           </div>
         </DashboardSection>

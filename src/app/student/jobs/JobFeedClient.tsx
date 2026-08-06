@@ -4,6 +4,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import PaginatedCollection from '@/components/ui/PaginatedCollection';
 import {
   CalendarDays,
   Clock,
@@ -333,7 +334,7 @@ function ApplyModal({
               justifyContent: 'center',
               gap: 7,
               padding: '12px',
-              background: loading ? '#93C5FD' : `linear-gradient(135deg, ${C.blue}, #1D4ED8)`,
+              background: loading ? '#93C5FD' : C.blue,
               color: C.white,
               border: 'none',
               borderRadius: 10,
@@ -672,10 +673,7 @@ export default function JobFeedClient({
               padding: '11px 16px',
               borderRadius: 11,
               border: 'none',
-              background:
-                smartLoading || !canUseSmart
-                  ? '#93C5FD'
-                  : `linear-gradient(135deg, ${C.blue}, #1D4ED8)`,
+              background: smartLoading || !canUseSmart ? '#93C5FD' : C.blue,
               color: C.white,
               cursor: smartLoading || !canUseSmart ? 'not-allowed' : 'pointer',
               fontSize: 13,
@@ -953,11 +951,14 @@ export default function JobFeedClient({
           </p>
         </div>
       ) : (
-        <div
+        <PaginatedCollection
+          itemLabel="job listings"
+          resetKey={`${search}|${datePosted}|${typeFilter}|${workModeFilter}|${locationFilter}|${skillFilter}|${stipendMin}|${stipendMax}|${sortBy}|${smartActive}`}
           className="job-card-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+            gridAutoRows: '1fr',
             gap: 16,
           }}
         >
@@ -980,6 +981,9 @@ export default function JobFeedClient({
                   boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
                   transition: 'box-shadow 0.2s, transform 0.2s',
                   cursor: 'default',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,0,0,0.09)';
@@ -998,7 +1002,7 @@ export default function JobFeedClient({
                       width: 44,
                       height: 44,
                       borderRadius: 12,
-                      background: `linear-gradient(135deg, ${C.indigo}, #334155)`,
+                      background: C.indigo,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1132,6 +1136,12 @@ export default function JobFeedClient({
                         color: C.text,
                         fontFamily: 'var(--font-display)',
                         margin: 0,
+                        minHeight: 38,
+                        lineHeight: 1.25,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
                       }}
                     >
                       {job.title}
@@ -1271,14 +1281,18 @@ export default function JobFeedClient({
                     gap: 8,
                     borderTop: `1px solid ${C.bg}`,
                     paddingTop: 12,
+                    marginTop: 'auto',
                   }}
                 >
                   <Link
                     href={`/student/jobs/${job._id}`}
                     style={{
                       flex: 1,
-                      textAlign: 'center',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       padding: '8px',
+                      minHeight: 40,
                       border: `1.5px solid ${C.border}`,
                       borderRadius: 9,
                       color: C.gray,
@@ -1299,11 +1313,7 @@ export default function JobFeedClient({
                       justifyContent: 'center',
                       gap: 5,
                       padding: '8px',
-                      background: job.hasApplied
-                        ? C.successBg
-                        : isExpired
-                          ? C.bg
-                          : `linear-gradient(135deg, ${C.blue}, #1D4ED8)`,
+                      background: job.hasApplied ? C.successBg : isExpired ? C.bg : C.blue,
                       color: job.hasApplied ? '#065F46' : isExpired ? C.light : C.white,
                       border: job.hasApplied
                         ? `1.5px solid ${C.successBorder}`
@@ -1311,6 +1321,7 @@ export default function JobFeedClient({
                           ? `1.5px solid ${C.border}`
                           : 'none',
                       borderRadius: 9,
+                      minHeight: 40,
                       fontSize: 12,
                       fontWeight: 700,
                       cursor: job.hasApplied || isExpired ? 'not-allowed' : 'pointer',
@@ -1341,7 +1352,7 @@ export default function JobFeedClient({
               </div>
             );
           })}
-        </div>
+        </PaginatedCollection>
       )}
 
       {applyingJob && (

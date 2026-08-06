@@ -162,10 +162,10 @@ export default async function StudentApplicationsPage() {
             >
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
-                  { label: 'Applications', value: stats.totalApps, color: '#0F172A' },
-                  { label: 'Events', value: stats.totalEvents, color: '#075985' },
-                  { label: 'Shortlisted', value: stats.shortlisted, color: '#047857' },
-                  { label: 'Avg Fit', value: `${stats.avgFit}%`, color: '#92400E' },
+                  { label: 'Applications', value: stats.totalApps, color: '#FFFFFF' },
+                  { label: 'Events', value: stats.totalEvents, color: '#BAE6FD' },
+                  { label: 'Shortlisted', value: stats.shortlisted, color: '#A7F3D0' },
+                  { label: 'Avg Fit', value: `${stats.avgFit}%`, color: '#FDE68A' },
                 ].map((s) => (
                   <div
                     key={s.label}

@@ -21,17 +21,17 @@ import {
   SendToBack,
 } from 'lucide-react';
 import { readJsonSafely } from '@/lib/safe-json';
+import PaginationControls from '@/components/ui/PaginationControls';
 
 const C = {
   blue: '#2563EB',
   dark: '#0F172A',
-  indigo2: '#1E293B',
   bg: '#F1F5F9',
   white: '#fff',
   border: '#E2E8F0',
   text: '#0F172A',
   gray: '#64748B',
-  light: '#94A3B8',
+  light: '#64748B',
   blueBg: '#EFF6FF',
   blueBorder: '#BFDBFE',
 };
@@ -205,25 +205,34 @@ export default function NotificationsPageClient({
   const [markingAll, setMarkingAll] = useState(false);
   const [filter, setFilter] = useState(defaultFilter);
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(24);
+  const [totalNotifications, setTotalNotifications] = useState(0);
 
   useEffect(() => {
     setFilter(defaultFilter);
+    setPage(1);
   }, [defaultFilter]);
 
   const fetchNotifs = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ limit: '50' });
+      const params = new URLSearchParams({ page: String(page), limit: String(pageSize) });
       if (showUnreadOnly) params.set('unread', 'true');
       if (filter !== 'all') params.set('type', filter);
       const res = await fetch(`/api/notifications?${params}`);
-      const data = await readJsonSafely<{ notifications?: Notif[]; unreadCount?: number }>(res, {});
+      const data = await readJsonSafely<{
+        notifications?: Notif[];
+        unreadCount?: number;
+        pagination?: { total?: number };
+      }>(res, {});
       setNotifs(data.notifications ?? []);
       setUnread(data.unreadCount ?? 0);
+      setTotalNotifications(data.pagination?.total ?? data.notifications?.length ?? 0);
     } finally {
       setLoading(false);
     }
-  }, [filter, showUnreadOnly]);
+  }, [filter, page, pageSize, showUnreadOnly]);
 
   useEffect(() => {
     fetchNotifs();
@@ -248,7 +257,7 @@ export default function NotificationsPageClient({
       {/* ── Header ── */}
       <div
         style={{
-          background: `linear-gradient(145deg, ${C.dark}, ${C.indigo2})`,
+          background: '#172033',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
@@ -281,7 +290,7 @@ export default function NotificationsPageClient({
                   width: 46,
                   height: 46,
                   borderRadius: 14,
-                  background: 'linear-gradient(135deg, #2563EB, #0D9488)',
+                  background: C.blue,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -303,12 +312,7 @@ export default function NotificationsPageClient({
                 >
                   {title}
                 </h1>
-                <div style={{ fontSize: 13, color: C.gray, marginTop: 3 }}>{subtitle}</div>
-                {unread > 0 && (
-                  <div style={{ fontSize: 12, color: '#93C5FD', marginTop: 3 }}>
-                    {unread} unread notification{unread !== 1 ? 's' : ''}
-                  </div>
-                )}
+                <div style={{ fontSize: 13, color: '#B8C5D6', marginTop: 3 }}>{subtitle}</div>
               </div>
             </div>
 
@@ -380,7 +384,10 @@ export default function NotificationsPageClient({
             {filterTabs.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => setFilter(tab.value)}
+                onClick={() => {
+                  setFilter(tab.value);
+                  setPage(1);
+                }}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -403,7 +410,10 @@ export default function NotificationsPageClient({
             ))}
           </div>
           <button
-            onClick={() => setShowUnreadOnly((v) => !v)}
+            onClick={() => {
+              setShowUnreadOnly((value) => !value);
+              setPage(1);
+            }}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -622,6 +632,20 @@ export default function NotificationsPageClient({
           )}
         </div>
 
+        {!loading && totalNotifications > 0 && (
+          <PaginationControls
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalNotifications}
+            itemLabel="notifications"
+            onPageChange={setPage}
+            onPageSizeChange={(nextPageSize) => {
+              setPageSize(nextPageSize);
+              setPage(1);
+            }}
+          />
+        )}
+
         {/* Footer */}
         {!loading && notifications.length > 0 && (
           <div
@@ -635,8 +659,7 @@ export default function NotificationsPageClient({
             }}
           >
             <div style={{ fontSize: 13, color: C.light }}>
-              {notifications.length} notification{notifications.length !== 1 ? 's' : ''} shown
-              {showUnreadOnly ? ' (unread only)' : ''}
+              {showUnreadOnly ? 'Showing unread notifications only' : 'Showing all notifications'}
             </div>
             <Link
               href={dashboardHref}

@@ -1,5 +1,5 @@
 ﻿// src/app/page.tsx
-// Nextern Landing Page â€” world-class, premium redesign
+// Nextern Landing Page — world-class, premium redesign
 // Sections: Navbar, Hero, Logos/Stats, Features, For Students, For Employers, Universities, Testimonials, CTA, Footer
 
 import Link from 'next/link';
@@ -474,7 +474,7 @@ function Step({
           style={{
             width: 44,
             height: 44,
-            background: 'linear-gradient(135deg, #2563EB, #22D3EE)',
+            background: '#2563EB',
             borderRadius: 12,
             display: 'flex',
             alignItems: 'center',
@@ -494,7 +494,7 @@ function Step({
             style={{
               width: 2,
               flex: 1,
-              background: 'linear-gradient(to bottom, #2563EB30, transparent)',
+              background: 'rgba(37, 99, 235, 0.16)',
               margin: '8px 0',
             }}
           />
@@ -595,7 +595,7 @@ function TestimonialCard({
             {name}
           </div>
           <div style={{ color: '#64748B', fontSize: 12 }}>
-            {role} Â· {uni}
+            {role} · {uni}
           </div>
         </div>
       </div>
@@ -715,7 +715,7 @@ export default async function LandingPage() {
               className="landing-get-started"
               href="/register"
               style={{
-                background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                background: '#2563EB',
                 color: '#fff',
                 padding: '9px 20px',
                 borderRadius: 9,
@@ -766,7 +766,7 @@ export default async function LandingPage() {
             right: '5%',
             width: 600,
             height: 600,
-            background: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)',
+            background: 'rgba(37,99,235,0.12)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -778,7 +778,7 @@ export default async function LandingPage() {
             left: '0%',
             width: 500,
             height: 500,
-            background: 'radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%)',
+            background: 'rgba(8,145,178,0.08)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -790,7 +790,7 @@ export default async function LandingPage() {
             left: '30%',
             width: 300,
             height: 300,
-            background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)',
+            background: 'rgba(124,58,237,0.06)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -860,7 +860,7 @@ export default async function LandingPage() {
                 journey{' '}
                 <span
                   style={{
-                    background: 'linear-gradient(120deg, #3B82F6 0%, #22D3EE 50%, #34D399 100%)',
+                    background: '#38BDF8',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
@@ -891,7 +891,7 @@ export default async function LandingPage() {
                 <Link
                   href="/register"
                   style={{
-                    background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                    background: '#2563EB',
                     color: '#fff',
                     padding: '15px 32px',
                     borderRadius: 12,
@@ -974,7 +974,7 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            {/* Right â€” Hero visual card */}
+            {/* Right — Hero visual card */}
             <div style={{ position: 'relative' }} className="hero-visual">
               {/* Main card */}
               <div
@@ -1049,7 +1049,7 @@ export default async function LandingPage() {
                     style={{
                       width: '78%',
                       height: '100%',
-                      background: 'linear-gradient(90deg, #2563EB, #22D3EE)',
+                      background: '#2563EB',
                       borderRadius: 999,
                     }}
                   />
@@ -1217,7 +1217,7 @@ export default async function LandingPage() {
                     New match found
                   </div>
                   <div style={{ fontSize: 11, color: '#64748B' }}>
-                    Frontend Dev @ bKash â€” 94% fit
+                    Frontend Dev @ bKash — 94% fit
                   </div>
                 </div>
               </div>
@@ -1305,7 +1305,7 @@ export default async function LandingPage() {
                 lineHeight: 1.7,
               }}
             >
-              From AI-powered matching to real-time mentorship â€” Nextern has every tool you need.
+              From AI-powered matching to real-time mentorship — Nextern has every tool you need.
             </p>
           </div>
 
@@ -1346,7 +1346,7 @@ export default async function LandingPage() {
               title="Graduation Report"
               accent="#0284C7"
               bg="#F0F9FF"
-              desc="A verified achievement document scoring your entire university career â€” shareable directly with top recruiters."
+              desc="A verified achievement document scoring your entire university career — shareable directly with top recruiters."
             />
             <FeatureCard
               icon={Icons.Users}
@@ -1459,10 +1459,10 @@ export default async function LandingPage() {
               </Link>
             </div>
 
-            {/* Right â€” dark card */}
+            {/* Right — dark card */}
             <div
               style={{
-                background: 'linear-gradient(145deg, #1E293B 0%, #0F172A 100%)',
+                background: '#172033',
                 borderRadius: 24,
                 padding: 32,
                 border: '1px solid rgba(255,255,255,0.09)',
@@ -1478,7 +1478,7 @@ export default async function LandingPage() {
                   right: -60,
                   width: 200,
                   height: 200,
-                  background: 'radial-gradient(circle, rgba(37,99,235,0.18), transparent 70%)',
+                  background: 'rgba(37,99,235,0.12)',
                   borderRadius: '50%',
                   pointerEvents: 'none',
                 }}
@@ -1495,7 +1495,7 @@ export default async function LandingPage() {
                     marginBottom: 8,
                   }}
                 >
-                  Your Fit Score â€” bKash Frontend Role
+                  Your Fit Score — bKash Frontend Role
                 </div>
                 <div
                   style={{
@@ -1542,7 +1542,7 @@ export default async function LandingPage() {
                     style={{
                       width: '78%',
                       height: '100%',
-                      background: 'linear-gradient(90deg, #2563EB, #22D3EE)',
+                      background: '#2563EB',
                       borderRadius: 999,
                     }}
                   />
@@ -1663,7 +1663,7 @@ export default async function LandingPage() {
             }}
             className="split-grid"
           >
-            {/* Left â€” Applicant pipeline card */}
+            {/* Left — Applicant pipeline card */}
             <div
               style={{
                 background: '#fff',
@@ -1694,7 +1694,7 @@ export default async function LandingPage() {
                     Applicant Pipeline
                   </div>
                   <div style={{ color: '#64748B', fontSize: 13, marginTop: 2 }}>
-                    Frontend Developer Intern â€” Dhaka
+                    Frontend Developer Intern — Dhaka
                   </div>
                 </div>
                 <span
@@ -2158,7 +2158,7 @@ export default async function LandingPage() {
       {/* â”€â”€ CTA BANNER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section
         style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E3A5F 60%, #0F172A 100%)',
+          background: '#172033',
           padding: '96px 0',
           position: 'relative',
           overflow: 'hidden',
@@ -2172,7 +2172,7 @@ export default async function LandingPage() {
             transform: 'translate(-50%,-50%)',
             width: 700,
             height: 700,
-            background: 'radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 60%)',
+            background: 'rgba(37,99,235,0.1)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -2184,7 +2184,7 @@ export default async function LandingPage() {
             right: '10%',
             width: 400,
             height: 400,
-            background: 'radial-gradient(circle, rgba(34,211,238,0.08) 0%, transparent 60%)',
+            background: 'rgba(8,145,178,0.07)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -2244,7 +2244,7 @@ export default async function LandingPage() {
             <Link
               href="/register"
               style={{
-                background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                background: '#2563EB',
                 color: '#fff',
                 padding: '16px 36px',
                 borderRadius: 12,

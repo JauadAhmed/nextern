@@ -141,7 +141,7 @@ export default async function EmployerAiPage() {
           }
           aside={
             <Panel
-              title={usage.isPremium ? 'Premium active' : 'Free employer plan'}
+              title={usage.isPremium ? 'AI access unlocked' : 'Free employer plan'}
               description={
                 usage.isPremium
                   ? 'Unlimited employer AI shortlists and job postings are unlocked.'

@@ -93,9 +93,7 @@ export default function JobApplyButton({
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          background: isEvent
-            ? 'linear-gradient(135deg, #7C3AED, #6D28D9)'
-            : 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+          background: isEvent ? '#7C3AED' : '#2563EB',
           color: '#fff',
           border: 'none',
           borderRadius: 12,
@@ -235,11 +233,7 @@ export default function JobApplyButton({
                   justifyContent: 'center',
                   gap: 7,
                   padding: '12px',
-                  background: loading
-                    ? '#93C5FD'
-                    : isEvent
-                      ? 'linear-gradient(135deg, #7C3AED, #6D28D9)'
-                      : 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                  background: loading ? '#93C5FD' : isEvent ? '#7C3AED' : '#2563EB',
                   color: '#fff',
                   border: 'none',
                   borderRadius: 10,

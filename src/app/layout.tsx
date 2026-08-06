@@ -11,12 +11,9 @@ export const metadata: Metadata = {
     'Connect students with internships, employers with talent, and universities with insight. AI-powered career readiness for Bangladesh universities.',
   keywords: ['internship', 'jobs', 'campus hiring', 'Bangladesh', 'BRAC', 'NSU', 'career'],
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/nextern_top_logo.jpg', type: 'image/jpeg' },
-    ],
-    shortcut: '/favicon.ico',
-    apple: '/nextern_top_logo.jpg',
+    icon: [{ url: '/nextern_logo_2.png', type: 'image/png' }],
+    shortcut: '/nextern_logo_2.png',
+    apple: '/nextern_logo_2.png',
   },
   openGraph: {
     title: 'Nextern — Campus Career Readiness Platform',

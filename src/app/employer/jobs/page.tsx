@@ -32,6 +32,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
+import PaginatedCollection from '@/components/ui/PaginatedCollection';
 
 const navItems = [
   { label: 'Overview', href: '/employer/dashboard', icon: 'dashboard' as const },
@@ -177,9 +178,9 @@ export default async function EmployerJobsPage() {
                       color: '#047857',
                       Icon: BriefcaseBusiness,
                     },
-                    { label: 'Total', value: stats.totalJobs, color: '#0F172A', Icon: BarChart3 },
-                    { label: 'Applicants', value: stats.totalApps, color: '#075985', Icon: Users },
-                    { label: 'Views', value: stats.totalViews, color: '#92400E', Icon: Eye },
+                    { label: 'Total', value: stats.totalJobs, color: '#FFFFFF', Icon: BarChart3 },
+                    { label: 'Applicants', value: stats.totalApps, color: '#BAE6FD', Icon: Users },
+                    { label: 'Views', value: stats.totalViews, color: '#FDE68A', Icon: Eye },
                   ] as { label: string; value: number; color: string; Icon: LucideIcon }[]
                 ).map((s) => (
                   <div
@@ -281,7 +282,10 @@ export default async function EmployerJobsPage() {
               />
             </Panel>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <PaginatedCollection
+              itemLabel="job listings"
+              style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+            >
               {jobs.map((job) => {
                 const typeStyle = TYPE_COLORS[job.type] ?? TYPE_COLORS['internship'];
                 const { daysLeft, isUrgent, isExpired } = job;
@@ -571,7 +575,7 @@ export default async function EmployerJobsPage() {
                   </div>
                 );
               })}
-            </div>
+            </PaginatedCollection>
           )}
         </DashboardSection>
 

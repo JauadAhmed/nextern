@@ -95,7 +95,7 @@ export default async function EmployerJobDetailPage({
         {/* Hero */}
         <div
           style={{
-            background: 'linear-gradient(145deg, #0F172A, #1E293B)',
+            background: '#172033',
             borderRadius: 28,
             padding: '32px 36px',
             boxShadow: '0 26px 60px rgba(15,23,42,0.16)',
@@ -110,7 +110,7 @@ export default async function EmployerJobDetailPage({
               right: -60,
               width: 240,
               height: 240,
-              background: 'radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)',
+              background: 'rgba(37,99,235,0.11)',
               borderRadius: '50%',
               pointerEvents: 'none',
             }}
@@ -281,7 +281,7 @@ export default async function EmployerJobDetailPage({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 7,
-                  background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                  background: '#2563EB',
                   color: '#fff',
                   padding: '12px 20px',
                   borderRadius: 12,

@@ -550,7 +550,7 @@ export default function RegisterPage() {
           width: '42%',
           minHeight: '100vh',
           flexShrink: 0,
-          background: 'linear-gradient(150deg, #0F172A 0%, #1E293B 50%, #0F2040 100%)',
+          background: '#172033',
           padding: '48px 48px',
           display: 'flex',
           flexDirection: 'column',
@@ -566,7 +566,7 @@ export default function RegisterPage() {
             right: -60,
             width: 300,
             height: 300,
-            background: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)',
+            background: 'rgba(37,99,235,0.13)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -578,7 +578,7 @@ export default function RegisterPage() {
             left: -40,
             width: 260,
             height: 260,
-            background: 'radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%)',
+            background: 'rgba(8,145,178,0.08)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -677,23 +677,20 @@ export default function RegisterPage() {
                   <br />
                   <span
                     style={{
-                      backgroundImage: `linear-gradient(120deg, ${activeRole.accent}, #22D3EE)`,
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
+                      color: activeRole.accent,
                     }}
                   >
                     {activeRole.title}
                   </span>
                 </h2>
-                <p style={{ color: '#64748B', fontSize: 15, lineHeight: 1.75 }}>
+                <p style={{ color: '#B8C5D6', fontSize: 15, lineHeight: 1.75 }}>
                   {activeRole.desc}
                 </p>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div
                   style={{
-                    color: '#475569',
+                    color: '#B8C5D6',
                     fontSize: 12,
                     fontWeight: 700,
                     letterSpacing: 1,
@@ -721,7 +718,7 @@ export default function RegisterPage() {
                     >
                       <CheckIcon />
                     </div>
-                    <span style={{ color: '#94A3B8', fontSize: 14 }}>{p}</span>
+                    <span style={{ color: '#CBD5E1', fontSize: 14 }}>{p}</span>
                   </div>
                 ))}
               </div>
@@ -744,16 +741,13 @@ export default function RegisterPage() {
                   <br />
                   <span
                     style={{
-                      background: 'linear-gradient(120deg, #3B82F6, #22D3EE)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
+                      color: '#38BDF8',
                     }}
                   >
                     ambitious students
                   </span>
                 </h2>
-                <p style={{ color: '#64748B', fontSize: 15, lineHeight: 1.75 }}>
+                <p style={{ color: '#B8C5D6', fontSize: 15, lineHeight: 1.75 }}>
                   Create your free account and get AI-powered career guidance tailored to the
                   Bangladesh job market.
                 </p>
@@ -782,7 +776,7 @@ export default function RegisterPage() {
                     >
                       <CheckIcon />
                     </div>
-                    <span style={{ color: '#94A3B8', fontSize: 14 }}>{t}</span>
+                    <span style={{ color: '#CBD5E1', fontSize: 14 }}>{t}</span>
                   </div>
                 ))}
               </div>
@@ -813,7 +807,7 @@ export default function RegisterPage() {
                     >
                       {s.v}
                     </div>
-                    <div style={{ fontSize: 12, color: '#475569', marginTop: 4 }}>{s.l}</div>
+                    <div style={{ fontSize: 12, color: '#B8C5D6', marginTop: 4 }}>{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -1442,9 +1436,7 @@ export default function RegisterPage() {
                   style={{
                     width: '100%',
                     padding: '14px',
-                    background: loading
-                      ? '#93C5FD'
-                      : `linear-gradient(135deg, ${activeRole.accent}, ${activeRole.accent}dd)`,
+                    background: loading ? '#93C5FD' : activeRole.accent,
                     color: '#fff',
                     border: 'none',
                     borderRadius: 12,

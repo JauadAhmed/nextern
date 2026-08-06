@@ -218,8 +218,7 @@ export default function AISkillAnalysisCard({
       <div
         style={{
           padding: 24,
-          background:
-            'linear-gradient(135deg, rgba(30,41,59,0.98), rgba(37,99,235,0.96) 62%, rgba(34,211,238,0.88))',
+          background: '#172033',
         }}
       >
         <div

@@ -480,7 +480,7 @@ export default function StudentNavbar({ user }: NavbarProps) {
                         width: 34,
                         height: 34,
                         borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #2563EB, #22D3EE)',
+                        background: '#2563EB',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -682,6 +682,8 @@ export default function StudentNavbar({ user }: NavbarProps) {
               className="student-navbar-mobile-icon-button"
               onClick={() => setMobileNavOpen(true)}
               aria-label="Open navigation"
+              aria-expanded={mobileNavOpen}
+              aria-controls="student-mobile-navigation"
             >
               <Menu size={18} />
             </button>
@@ -761,7 +763,11 @@ export default function StudentNavbar({ user }: NavbarProps) {
         aria-label="Close navigation"
       />
 
-      <aside className={`student-navbar-mobile-drawer ${mobileNavOpen ? 'is-open' : ''}`}>
+      <aside
+        id="student-mobile-navigation"
+        aria-hidden={!mobileNavOpen}
+        className={`student-navbar-mobile-drawer ${mobileNavOpen ? 'is-open' : ''}`}
+      >
         <div className="student-navbar-mobile-drawer-header">
           <NexternLogo
             markSize={34}
@@ -986,7 +992,7 @@ export default function StudentNavbar({ user }: NavbarProps) {
           position: fixed;
           inset: 0 auto 0 0;
           width: min(360px, 92vw);
-          background: linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 100%);
+          background: #F8FAFC;
           box-shadow: 0 24px 60px rgba(15,23,42,0.24);
           padding: 16px;
           display: flex;
@@ -1016,7 +1022,7 @@ export default function StudentNavbar({ user }: NavbarProps) {
           gap: 12px;
           padding: 16px;
           border-radius: 24px;
-          background: linear-gradient(145deg, #1E293B, rgba(30,41,59,0.98) 55%, rgba(37,99,235,0.96));
+          background: #23324A;
           color: #E2E8F0;
           border: 1px solid rgba(255,255,255,0.08);
           box-shadow: 0 18px 32px rgba(15,23,42,0.16);
@@ -1031,7 +1037,7 @@ export default function StudentNavbar({ user }: NavbarProps) {
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #2563EB, #22D3EE);
+          background: #2563EB;
           display: flex;
           align-items: center;
           justify-content: center;

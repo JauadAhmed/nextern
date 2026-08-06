@@ -154,8 +154,7 @@ export default function StudentPremiumPage() {
     <div style={{ minHeight: '100vh', background: C.bg, fontFamily: 'var(--font-body)' }}>
       <header
         style={{
-          background:
-            'linear-gradient(135deg, #1E293B, rgba(30,41,59,0.98) 55%, rgba(37,99,235,0.96))',
+          background: '#172033',
           borderBottom: '1px solid rgba(255,255,255,0.08)',
           position: 'sticky',
           top: 0,
@@ -214,7 +213,7 @@ export default function StudentPremiumPage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              background: 'linear-gradient(135deg, #2563EB14, #22D3EE14)',
+              background: '#EFF6FF',
               border: '1px solid rgba(37,99,235,0.2)',
               borderRadius: 999,
               padding: '7px 18px',
@@ -273,7 +272,7 @@ export default function StudentPremiumPage() {
         {premiumLoaded && isPremium ? (
           <div
             style={{
-              background: 'linear-gradient(135deg, #FEF3C7, #FFF7ED)',
+              background: '#FFFBEB',
               border: '1px solid rgba(245,158,11,0.35)',
               borderRadius: 18,
               padding: '16px 18px',
@@ -341,7 +340,7 @@ export default function StudentPremiumPage() {
           <div>
             <div
               style={{
-                background: 'linear-gradient(145deg, #1E293B, #0F172A)',
+                background: '#172033',
                 borderRadius: 28,
                 padding: 32,
                 border: '1px solid rgba(37,99,235,0.3)',
@@ -358,7 +357,7 @@ export default function StudentPremiumPage() {
                   right: -60,
                   width: 200,
                   height: 200,
-                  background: 'radial-gradient(circle, rgba(37,99,235,0.2), transparent 70%)',
+                  background: 'rgba(37,99,235,0.12)',
                   borderRadius: '50%',
                 }}
               />
@@ -399,7 +398,7 @@ export default function StudentPremiumPage() {
                   >
                     {plan.name}
                   </h2>
-                  <p style={{ color: '#64748B', fontSize: 14, marginTop: 4 }}>{plan.tagline}</p>
+                  <p style={{ color: '#B8C5D6', fontSize: 14, marginTop: 4 }}>{plan.tagline}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div
@@ -413,7 +412,7 @@ export default function StudentPremiumPage() {
                   >
                     ৳{plan.price}
                   </div>
-                  <div style={{ color: '#64748B', fontSize: 13, marginTop: 4 }}>per month</div>
+                  <div style={{ color: '#B8C5D6', fontSize: 13, marginTop: 4 }}>per month</div>
                 </div>
               </div>
 

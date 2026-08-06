@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import PaginatedCollection from '@/components/ui/PaginatedCollection';
 
 type StudentDirectoryStudent = {
   id: string;
@@ -229,7 +230,11 @@ export default function StudentDirectory({
             {emptyDescription}
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: 14 }}>
+          <PaginatedCollection
+            itemLabel="students"
+            resetKey={`${filters.q}|${filters.studentId}|${filters.semester}|${filters.department}|${filters.sort}`}
+            style={{ display: 'grid', gap: 14 }}
+          >
             {students.map((student) => (
               <div
                 key={student.id}
@@ -305,7 +310,7 @@ export default function StudentDirectory({
                 </div>
               </div>
             ))}
-          </div>
+          </PaginatedCollection>
         )}
       </div>
 

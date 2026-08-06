@@ -495,7 +495,7 @@ export default function EditJobPage() {
         {/* Header */}
         <div
           style={{
-            background: `linear-gradient(145deg, ${C.dark}, ${C.indigo})`,
+            background: C.dark,
             padding: '24px 0 28px',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
           }}
@@ -909,7 +909,7 @@ export default function EditJobPage() {
                   alignItems: 'center',
                   gap: 7,
                   padding: '10px 28px',
-                  background: loading ? '#93C5FD' : `linear-gradient(135deg, ${C.blue}, #1D4ED8)`,
+                  background: loading ? '#93C5FD' : C.blue,
                   color: C.white,
                   border: 'none',
                   borderRadius: 10,
