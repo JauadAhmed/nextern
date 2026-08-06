@@ -11,6 +11,11 @@ import { CreateJobSchema } from '@/lib/validations';
 import { checkFeatureAccess, syncPremiumStatus } from '@/lib/premium';
 import { syncOwnedEventToCalendar } from '@/lib/calendar';
 import { onJobPosted, onEventCreated } from '@/lib/events';
+import { parsePaginationParams } from '@/lib/pagination';
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // ── GET ───────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -23,8 +28,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type');
     const search = searchParams.get('search') ?? '';
-    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
-    const limit = Math.min(20, parseInt(searchParams.get('limit') ?? '12'));
+    const { page, limit, skip } = parsePaginationParams(searchParams, {
+      defaultLimit: 12,
+      maxLimit: 20,
+    });
     const active = searchParams.get('active');
 
     await connectDB();
@@ -56,7 +63,7 @@ export async function GET(req: NextRequest) {
 
     if (type) query.type = type;
     if (search) {
-      const regex = { $regex: search, $options: 'i' };
+      const regex = { $regex: escapeRegExp(search), $options: 'i' };
       const searchClause = {
         $or: [{ title: regex }, { companyName: regex }, { description: regex }],
       };
@@ -69,11 +76,7 @@ export async function GET(req: NextRequest) {
     }
 
     const [jobs, total] = await Promise.all([
-      Job.find(query)
-        .sort({ isPremiumListing: -1, createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean(),
+      Job.find(query).sort({ isPremiumListing: -1, createdAt: -1 }).skip(skip).limit(limit).lean(),
       Job.countDocuments(query),
     ]);
 

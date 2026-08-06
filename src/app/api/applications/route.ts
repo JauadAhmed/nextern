@@ -11,6 +11,7 @@ import { onApplicationStatusChangedForApplication } from '@/lib/events';
 import { Job } from '@/models/Job';
 import { syncInterviewToCalendar, removeCalendarEvent } from '@/lib/calendar';
 import mongoose from 'mongoose';
+import { parsePaginationParams } from '@/lib/pagination';
 
 // ── GET ───────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -23,12 +24,18 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const jobId = searchParams.get('jobId');
     const employerIdParam = searchParams.get('employerId');
-    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
-    const limit = Math.min(50, parseInt(searchParams.get('limit') ?? '20'));
+    const { page, limit, skip } = parsePaginationParams(searchParams, {
+      defaultLimit: 20,
+      maxLimit: 50,
+    });
 
     await connectDB();
 
     const query: Record<string, unknown> = {};
+
+    if (jobId && !mongoose.Types.ObjectId.isValid(jobId)) {
+      return NextResponse.json({ error: 'Invalid job ID' }, { status: 400 });
+    }
 
     if (session.user.role === 'student') {
       query.studentId = session.user.id;
@@ -53,7 +60,7 @@ export async function GET(req: NextRequest) {
           'name email university department cgpa skills opportunityScore resumeUrl image yearOfStudy'
         )
         .sort({ appliedAt: -1 })
-        .skip((page - 1) * limit)
+        .skip(skip)
         .limit(limit)
         .lean(),
       Application.countDocuments(query),
@@ -79,8 +86,8 @@ export async function PATCH(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const appId = searchParams.get('id');
-    if (!appId) {
-      return NextResponse.json({ error: 'Application ID is required' }, { status: 400 });
+    if (!appId || !mongoose.Types.ObjectId.isValid(appId)) {
+      return NextResponse.json({ error: 'Valid application ID is required' }, { status: 400 });
     }
 
     const body = await req.json();

@@ -445,13 +445,12 @@ export async function getAdvisorDashboardData(
   ]);
 
   const studentIds = students.map((student) => student._id);
-  const [applications, interviewJobs, reviews] = await Promise.all([
+  const [applications, reviews] = await Promise.all([
     studentIds.length
       ? Application.find({ studentId: { $in: studentIds }, isEventRegistration: false })
           .select('studentId jobId status interviewScheduledAt hardGaps')
           .lean()
       : [],
-    studentIds.length ? Job.find({}).select('title companyName').lean() : [],
     studentIds.length
       ? Review.find({
           revieweeId: { $in: studentIds },
@@ -459,10 +458,19 @@ export async function getAdvisorDashboardData(
           isPublic: true,
           isVerified: true,
         })
-          .populate('reviewerId', 'name companyDetails.companyName')
+          .populate('reviewerId', 'name companyName')
           .lean()
       : [],
   ]);
+
+  const interviewJobIds = applications
+    .filter((application) => application.status === 'interview_scheduled')
+    .map((application) => application.jobId);
+  const interviewJobs = interviewJobIds.length
+    ? await Job.find({ _id: { $in: interviewJobIds } })
+        .select('title companyName')
+        .lean()
+    : [];
 
   const flaggedStudentIds = new Set(
     actions
@@ -520,9 +528,15 @@ export async function getAdvisorDashboardData(
     advisorNote: action.advisorNote,
   }));
 
-  const priorityStudents = attentionStudents.filter((student) => student.priorityFlagged).length;
+  const priorityStudents = students.filter(
+    (student) =>
+      flaggedStudentIds.has(student._id.toString()) ||
+      (student.opportunityScore ?? 0) < 40 ||
+      (student.profileCompleteness ?? 0) < 60
+  ).length;
 
   let totalWorkQuality = 0;
+  let workQualityRatingCount = 0;
   let totalRecommendations = 0;
   const rawRecommendations: {
     id: string;
@@ -539,10 +553,13 @@ export async function getAdvisorDashboardData(
       isRecommended?: boolean;
       recommendationText?: string;
       revieweeId: unknown;
-      reviewerId?: { name?: string; companyDetails?: { companyName?: string } };
+      reviewerId?: { name?: string; companyName?: string };
       createdAt: Date;
     }) => {
-      if (r.workQualityRating) totalWorkQuality += r.workQualityRating;
+      if (r.workQualityRating) {
+        totalWorkQuality += r.workQualityRating;
+        workQualityRatingCount++;
+      }
       if (r.isRecommended) {
         totalRecommendations++;
       }
@@ -550,7 +567,7 @@ export async function getAdvisorDashboardData(
         rawRecommendations.push({
           id: String(r._id),
           studentName: studentMap.get(String(r.revieweeId))?.name ?? 'Unknown Student',
-          companyName: r.reviewerId?.companyDetails?.companyName || r.reviewerId?.name || 'Company',
+          companyName: r.reviewerId?.companyName || r.reviewerId?.name || 'Company',
           text: r.recommendationText,
           createdAt: r.createdAt,
         });
@@ -598,7 +615,9 @@ export async function getAdvisorDashboardData(
     reputationStats: {
       totalReviews: reviews.length,
       totalRecommendations,
-      avgWorkQuality: reviews.length ? Number((totalWorkQuality / reviews.length).toFixed(1)) : 0,
+      avgWorkQuality: workQualityRatingCount
+        ? Number((totalWorkQuality / workQualityRatingCount).toFixed(1))
+        : 0,
     },
     recentRecommendations,
   };

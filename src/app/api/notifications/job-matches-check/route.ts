@@ -6,8 +6,8 @@ import { Application } from '@/models/Application';
 import { Job } from '@/models/Job';
 import { Notification } from '@/models/Notification';
 import { notifyJobMatch } from '@/lib/notify';
+import { isAuthorizedCronRequest } from '@/lib/cron-auth';
 
-const CRON_SECRET = process.env.CRON_SECRET ?? 'nextern-cron-2026';
 const LOOKBACK_DAYS = 7;
 const MAX_NOTIFICATIONS_PER_STUDENT = 3;
 
@@ -67,8 +67,7 @@ function scoreJobMatch(student: LeanStudent, job: LeanJob) {
 }
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret') ?? req.nextUrl.searchParams.get('secret');
-  if (secret !== CRON_SECRET) {
+  if (!isAuthorizedCronRequest(req)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

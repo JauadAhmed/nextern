@@ -11,6 +11,7 @@ import { Mentor } from '@/models/Mentor';
 import { MentorSession } from '@/models/MentorSession';
 import mongoose from 'mongoose';
 import Pusher from 'pusher';
+import { ReadMessageThreadSchema, SendMessageSchema } from '@/lib/validations';
 
 // ── Pusher server instance ─────────────────────────────────────────────────
 const pusher = new Pusher({
@@ -265,30 +266,27 @@ export async function POST(req: NextRequest) {
 
   await connectDB();
 
+  const body = await req.json().catch(() => ({}));
+  const parsed = SendMessageSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
   const {
     receiverId,
     content,
     templateType,
     attachments,
     forwardedFromId,
-    threadId,
     threadType,
     relatedFreelanceOrderId,
-  } = await req.json();
-
-  if (
-    (!content?.trim() && (!attachments || attachments.length === 0)) ||
-    (!receiverId && !relatedFreelanceOrderId)
-  ) {
-    return NextResponse.json(
-      { error: 'A valid recipient and either content or attachments are required' },
-      { status: 400 }
-    );
-  }
+  } = parsed.data;
 
   const isFlagged = checkIsFlagged(content || '');
   let resolvedReceiverId = receiverId;
-  let resolvedThreadId = threadId;
+  let resolvedThreadId: string | undefined;
   let resolvedThreadType: 'direct' | 'freelance_order' =
     threadType === 'freelance_order' ? 'freelance_order' : 'direct';
   let resolvedFreelanceOrderId: mongoose.Types.ObjectId | undefined;
@@ -339,16 +337,19 @@ export async function POST(req: NextRequest) {
       });
     }
   } else {
-    if (!receiverId || !mongoose.Types.ObjectId.isValid(receiverId)) {
+    if (!receiverId) {
       return NextResponse.json({ error: 'Invalid receiverId' }, { status: 400 });
     }
 
     resolvedThreadId = makeThreadId(session.user.id, receiverId);
+    const receiver = await User.findById(receiverId).select('role').lean();
+    if (!receiver) {
+      return NextResponse.json({ error: 'Recipient not found' }, { status: 404 });
+    }
 
     // ── Student → Employer guard ───────────────────────────────────────────
     // Students may only message employers if they have an eligible application.
     if (session.user.role === 'student') {
-      const receiver = await User.findById(receiverId).select('role').lean();
       if (receiver?.role === 'employer') {
         const ELIGIBLE = ['shortlisted', 'assessment_sent', 'interview_scheduled', 'hired'];
         const eligibleApp = await Application.findOne({
@@ -374,8 +375,6 @@ export async function POST(req: NextRequest) {
     // ── Student ↔ Mentor guard ─────────────────────────────────────────────
     // Mentors (alumni) and students can only message each other if they have a scheduled/accepted/completed session
     if (session.user.role === 'alumni' || session.user.role === 'student') {
-      const receiver = await User.findById(receiverId).select('role').lean();
-
       if (
         (session.user.role === 'alumni' && receiver?.role === 'student') ||
         (session.user.role === 'student' && receiver?.role === 'alumni')
@@ -415,27 +414,36 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  if (forwardedFromId) {
+    const forwardedMessage = await Message.findOne({
+      _id: forwardedFromId,
+      $or: [{ senderId: session.user.id }, { receiverId: session.user.id }],
+      deletedFor: { $ne: session.user.id },
+      isDeletedForEveryone: { $ne: true },
+    })
+      .select('_id')
+      .lean();
+    if (!forwardedMessage) {
+      return NextResponse.json({ error: 'Forwarded message not found' }, { status: 404 });
+    }
+  }
+
+  if (!resolvedReceiverId || !resolvedThreadId) {
+    return NextResponse.json({ error: 'Unable to resolve message recipient' }, { status: 400 });
+  }
+
   const message = await Message.create({
     senderId: toObjectId(session.user.id),
     receiverId: toObjectId(resolvedReceiverId),
     threadId: resolvedThreadId,
     threadType: resolvedThreadType,
-    content: content?.trim() || ' ',
+    content: content || ' ',
+    attachments,
     relatedFreelanceOrderId: resolvedFreelanceOrderId,
-    forwardedFromId:
-      forwardedFromId && mongoose.Types.ObjectId.isValid(forwardedFromId)
-        ? toObjectId(forwardedFromId)
-        : undefined,
+    forwardedFromId: forwardedFromId ? toObjectId(forwardedFromId) : undefined,
     isFlagged,
     templateType: templateType || null,
   });
-
-  // Force inject attachments natively to bypass NextJS strictly caching the old schema!
-  if (attachments && attachments.length > 0) {
-    await mongoose.connection
-      .collection('messages')
-      .updateOne({ _id: message._id }, { $set: { attachments: attachments } });
-  }
 
   // Populate sender for the Pusher payload
   const populated = await Message.findById(message._id)
@@ -460,8 +468,12 @@ export async function PATCH(req: NextRequest) {
 
   await connectDB();
 
-  const { threadId } = await req.json();
-  if (!threadId) return NextResponse.json({ error: 'threadId required' }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  const parsed = ReadMessageThreadSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Valid threadId is required' }, { status: 400 });
+  }
+  const { threadId } = parsed.data;
 
   const receiverId = new mongoose.Types.ObjectId(session.user.id);
 

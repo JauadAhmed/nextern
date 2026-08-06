@@ -12,24 +12,55 @@ export const StrongPasswordSchema = z
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
-export const RegisterSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').max(60),
-  email: z.string().email('Invalid email address').toLowerCase(),
-  password: StrongPasswordSchema,
-  role: z.enum(['student', 'employer']),
+export const RegisterSchema = z
+  .object({
+    name: z.string().min(2, 'Name must be at least 2 characters').max(60),
+    email: z.string().email('Invalid email address').toLowerCase(),
+    password: StrongPasswordSchema,
+    role: z.enum(['student', 'employer']),
 
-  // Student fields
-  university: z.string().min(2).max(120).optional(),
-  department: z.string().min(2).max(60).optional(),
-  yearOfStudy: z.number().int().min(1).max(5).optional(),
-  studentId: z.string().max(20).optional(),
+    // Student fields
+    university: z.string().min(2).max(120).optional(),
+    department: z.string().min(2).max(60).optional(),
+    yearOfStudy: z.number().int().min(1).max(5).optional(),
+    studentId: z.string().max(20).optional(),
 
-  // Employer fields
-  companyName: z.string().min(2).max(120).optional(),
-  industry: z.string().min(2).max(80).optional(),
-  tradeLicenseNo: z.string().max(50).optional(),
-  headquartersCity: z.string().max(60).optional(),
-});
+    // Employer fields
+    companyName: z.string().min(2).max(120).optional(),
+    industry: z.string().min(2).max(80).optional(),
+    tradeLicenseNo: z.string().max(50).optional(),
+    headquartersCity: z.string().max(60).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.role === 'student') {
+      if (!data.university) {
+        ctx.addIssue({ code: 'custom', path: ['university'], message: 'University is required' });
+      }
+      if (!data.department) {
+        ctx.addIssue({ code: 'custom', path: ['department'], message: 'Department is required' });
+      }
+      if (!data.yearOfStudy) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['yearOfStudy'],
+          message: 'Year of study is required',
+        });
+      }
+    }
+
+    if (data.role === 'employer') {
+      if (!data.companyName) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['companyName'],
+          message: 'Company name is required',
+        });
+      }
+      if (!data.industry) {
+        ctx.addIssue({ code: 'custom', path: ['industry'], message: 'Industry is required' });
+      }
+    }
+  });
 
 export const LoginSchema = z.object({
   email: z.string().email().toLowerCase(),
@@ -47,6 +78,15 @@ export const VerifyEmailSchema = z.object({
 export const ResendOTPSchema = z.object({
   email: z.string().email().toLowerCase(),
   type: z.enum(['email_verify', 'password_reset']),
+});
+
+export const ResetPasswordSchema = z.object({
+  email: z.string().email('Invalid email address').toLowerCase(),
+  otp: z
+    .string()
+    .length(6, 'Code must be 6 digits')
+    .regex(/^\d{6}$/, 'Code must be numeric'),
+  newPassword: StrongPasswordSchema,
 });
 
 // ── Profile ───────────────────────────────────────────────────────────────────
@@ -379,6 +419,114 @@ export const UpdateApplicationStatusSchema = z.object({
     'withdrawn',
   ]),
   note: z.string().max(500).optional(),
+});
+
+const JobReviewBaseSchema = z.object({
+  applicationId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid application ID'),
+  revieweeId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid review recipient ID'),
+  comment: z.string().trim().max(1500).optional().or(z.literal('')),
+});
+
+export const JobReviewSchema = z.discriminatedUnion('reviewType', [
+  JobReviewBaseSchema.extend({
+    reviewType: z.literal('student_to_employer'),
+    overallRating: z.number().int().min(1).max(5),
+    workEnvironmentRating: z.number().int().min(1).max(5),
+    learningOpportunityRating: z.number().int().min(1).max(5),
+    mentorshipQualityRating: z.number().int().min(1).max(5).optional(),
+    comment: z.string().trim().min(1, 'Written feedback is required').max(1500),
+  }),
+  JobReviewBaseSchema.extend({
+    reviewType: z.literal('employer_to_student'),
+    professionalismRating: z.number().int().min(1).max(5),
+    punctualityRating: z.number().int().min(1).max(5),
+    skillPerformanceRating: z.number().int().min(1).max(5),
+    workQualityRating: z.number().int().min(1).max(5),
+    isRecommended: z.boolean().default(false),
+    recommendationText: z.string().trim().max(3000).optional().or(z.literal('')),
+  }).superRefine((data, ctx) => {
+    if (data.isRecommended && !data.recommendationText) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['recommendationText'],
+        message: 'Recommendation text is required for a formal recommendation',
+      });
+    }
+  }),
+]);
+
+export const MentorSessionRequestSchema = z.object({
+  mentorId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid mentor ID'),
+  sessionType: z.enum(['resume_review', 'career_advice', 'mock_interview', 'general']),
+  studentNotes: z.string().trim().min(1, 'Session notes are required').max(500),
+});
+
+export const MentorSessionUpdateSchema = z
+  .object({
+    status: z.enum(['accepted', 'rejected', 'completed', 'cancelled']),
+    scheduledAt: z.string().datetime().optional(),
+    durationMinutes: z.number().int().min(15).max(240).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.status === 'accepted' && !data.scheduledAt) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['scheduledAt'],
+        message: 'A schedule is required when accepting a session',
+      });
+    }
+  });
+
+export const MentorSessionRatingSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  review: z.string().trim().max(500).optional().or(z.literal('')),
+});
+
+const MessageAttachmentSchema = z.object({
+  url: z.string().url().max(2000),
+  name: z.string().trim().min(1).max(255),
+  type: z.string().trim().min(1).max(120),
+});
+
+export const SendMessageSchema = z
+  .object({
+    receiverId: z
+      .string()
+      .regex(/^[0-9a-fA-F]{24}$/)
+      .optional(),
+    content: z.string().trim().max(5000).optional().default(''),
+    templateType: z.enum(['interview_invite', 'rejection', 'offer_letter']).nullable().optional(),
+    attachments: z.array(MessageAttachmentSchema).max(5).optional().default([]),
+    forwardedFromId: z
+      .string()
+      .regex(/^[0-9a-fA-F]{24}$/)
+      .optional(),
+    threadType: z.enum(['direct', 'freelance_order']).optional().default('direct'),
+    relatedFreelanceOrderId: z
+      .string()
+      .regex(/^[0-9a-fA-F]{24}$/)
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.receiverId && !data.relatedFreelanceOrderId) {
+      ctx.addIssue({ code: 'custom', path: ['receiverId'], message: 'A recipient is required' });
+    }
+    if (!data.content && data.attachments.length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['content'],
+        message: 'A message or attachment is required',
+      });
+    }
+  });
+
+export const EditMessageSchema = z.object({
+  messageId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid message ID'),
+  content: z.string().trim().min(1, 'Content cannot be empty').max(5000),
+});
+
+export const ReadMessageThreadSchema = z.object({
+  threadId: z.string().trim().min(1).max(200),
 });
 
 export const OpportunityRecommendationSchema = z.object({

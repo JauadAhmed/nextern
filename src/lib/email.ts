@@ -1152,6 +1152,54 @@ export function otpEmailTemplate(otp: string, name: string): string {
 }
 
 // ── Welcome email ──────────────────────────────────────────────────────────
+export function passwordResetOtpEmailTemplate(otp: string, name: string): string {
+  return emailWrapper(
+    `
+    <tr>
+      <td style="padding:36px 40px 0;">
+        <span style="display:inline-block;background:#EFF6FF;color:#1D4ED8;
+                     font-size:10px;font-weight:700;letter-spacing:1.4px;
+                     text-transform:uppercase;padding:5px 13px;border-radius:6px;">
+          Password Reset
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:14px 40px 0;">
+        <p style="margin:0 0 6px;color:#64748B;font-size:13px;">Hi ${name},</p>
+        <h1 style="margin:0;color:#0F172A;font-size:26px;font-weight:800;letter-spacing:-0.4px;">
+          Reset your password
+        </h1>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:20px 40px 0;">
+        <p style="margin:0 0 20px;color:#374151;font-size:14px;line-height:1.85;">
+          Use the security code below to reset your Nextern password. This code is valid for
+          <strong>10 minutes</strong> and may only be used once.
+        </p>
+        <div style="background:#F8FAFC;border:1.5px dashed #2563EB;border-radius:14px;
+                    padding:28px;text-align:center;margin-bottom:20px;">
+          <p style="margin:0 0 10px;color:#64748B;font-size:11px;
+                    text-transform:uppercase;letter-spacing:2px;font-weight:700;">
+            Your Password Reset Code
+          </p>
+          <p style="margin:0;color:#0F172A;font-size:38px;font-weight:800;letter-spacing:12px;">
+            ${otp}
+          </p>
+        </div>
+        <p style="margin:0;color:#94A3B8;font-size:12px;line-height:1.7;">
+          If you did not request a password reset, disregard this message. Never share this code
+          with anyone.
+        </p>
+      </td>
+    </tr>
+    <tr><td style="padding:0 0 40px;"></td></tr>
+  `,
+    '#2563EB'
+  );
+}
+
 export function welcomeEmailTemplate(name: string, role: string): string {
   const loginUrl = getLoginUrl();
   const roleMessages: Record<string, string> = {

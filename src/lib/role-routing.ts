@@ -17,7 +17,7 @@ type RoutedUser = {
 };
 
 const PENDING_APPROVAL_ROLES: UserRole[] = ['employer'];
-const AUTH_ONLY_ROUTES = ['/login', '/register', '/verify-email'];
+const AUTH_ONLY_ROUTES = ['/login', '/register', '/verify-email', '/forgot-password'];
 const ROLE_ROUTE_PREFIXES: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/student', roles: ['student', 'alumni'] },
   { prefix: '/employer', roles: ['employer'] },

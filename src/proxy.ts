@@ -1,5 +1,5 @@
-// src/middleware.ts
-// Next.js Edge Middleware runs before every request.
+// src/proxy.ts
+// Next.js Proxy runs before every request.
 // Handles: auth guards, role-based redirects, email verification check.
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,10 +13,21 @@ import {
 } from '@/lib/role-routing';
 
 // Routes accessible without authentication
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/verify-email', '/api/auth'];
+const PUBLIC_ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/verify-email',
+  '/forgot-password',
+  '/terms',
+  '/privacy',
+  '/api/auth',
+];
 
 // Routes accessible only while NOT authenticated (redirect logged-in users away)
-const AUTH_ONLY_ROUTES = ['/login', '/register', '/verify-email'];
+const AUTH_ONLY_ROUTES = ['/login', '/register', '/verify-email', '/forgot-password'];
+
+const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim();
 
 type MiddlewareToken = {
   id?: string;
@@ -37,7 +48,7 @@ const ROLE_ROUTES: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/admin', roles: ['admin'] },
 ];
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Skip middleware for static assets and API routes
@@ -52,7 +63,7 @@ export default async function middleware(req: NextRequest) {
 
   const token = (await getToken({
     req,
-    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+    secret: authSecret,
     secureCookie: req.nextUrl.protocol === 'https:',
   })) as MiddlewareToken | null;
 
@@ -106,17 +117,17 @@ export default async function middleware(req: NextRequest) {
     }
   }
 
-  // Strict isolation for alumni: Block them from student job-seeking tools
+  // Strict isolation for alumni: only expose the mentor workspace and shared account tools.
   if (token?.role === 'alumni') {
-    const BLOCKED_ALUMNI_ROUTES = [
-      '/student/dashboard',
-      '/student/jobs',
-      '/student/applications',
-      '/student/freelance',
-      '/student/ger',
+    const ALUMNI_ALLOWED_ROUTES = [
+      '/student/mentorship',
+      '/student/messages',
+      '/student/notifications',
+      '/student/profile',
     ];
     if (
-      BLOCKED_ALUMNI_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'))
+      pathname.startsWith('/student') &&
+      !ALUMNI_ALLOWED_ROUTES.some((route) => pathname === route || pathname.startsWith(route + '/'))
     ) {
       return NextResponse.redirect(new URL('/student/mentorship/dashboard', req.url));
     }

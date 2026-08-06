@@ -3,12 +3,16 @@ import { auth } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
 import { Mentor } from '@/models/Mentor';
 import { BadgeAward } from '@/models/BadgeAward';
+import mongoose from 'mongoose';
 
 type Params = { params: Promise<{ mentorId: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
     const { mentorId } = await params;
+    if (!mongoose.Types.ObjectId.isValid(mentorId)) {
+      return NextResponse.json({ error: 'Invalid mentor ID' }, { status: 400 });
+    }
     await connectDB();
 
     const mentor = await Mentor.findById(mentorId).populate('userId', 'name image email').lean();
@@ -45,6 +49,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const { mentorId } = await params;
+    if (!mongoose.Types.ObjectId.isValid(mentorId)) {
+      return NextResponse.json({ error: 'Invalid mentor ID' }, { status: 400 });
+    }
     const body = await req.json();
 
     await connectDB();

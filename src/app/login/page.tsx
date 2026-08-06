@@ -517,8 +517,11 @@ export default function LoginPage() {
 
       {/* ── RIGHT FORM PANEL ──────────────────────────────────────── */}
       <div
+        className="auth-form-panel"
         style={{
           flex: 1,
+          width: '100%',
+          minWidth: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -715,8 +718,8 @@ export default function LoginPage() {
                 }}
               >
                 <label style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}>Password</label>
-                <a
-                  href="#"
+                <Link
+                  href="/forgot-password"
                   style={{
                     fontSize: 13,
                     color: '#2563EB',
@@ -725,7 +728,7 @@ export default function LoginPage() {
                   }}
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <div style={{ position: 'relative' }}>
                 <div
@@ -860,13 +863,13 @@ export default function LoginPage() {
             }}
           >
             By signing in, you agree to our{' '}
-            <a href="#" style={{ color: '#64748B', textDecoration: 'underline' }}>
+            <Link href="/terms" style={{ color: '#64748B', textDecoration: 'underline' }}>
               Terms of Service
-            </a>{' '}
+            </Link>{' '}
             and{' '}
-            <a href="#" style={{ color: '#64748B', textDecoration: 'underline' }}>
+            <Link href="/privacy" style={{ color: '#64748B', textDecoration: 'underline' }}>
               Privacy Policy
-            </a>
+            </Link>
             .
           </p>
         </div>
@@ -876,6 +879,7 @@ export default function LoginPage() {
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
           .brand-panel { display: none !important; }
+          .auth-form-panel { padding: 40px 18px !important; }
         }
       `}</style>
     </div>

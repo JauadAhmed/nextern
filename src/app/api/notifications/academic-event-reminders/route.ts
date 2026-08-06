@@ -5,8 +5,8 @@ import { Application } from '@/models/Application';
 import { Notification } from '@/models/Notification';
 import { User } from '@/models/User';
 import { notifyHostedEventReminder, notifyRegisteredEventReminder } from '@/lib/notify';
+import { isAuthorizedCronRequest } from '@/lib/cron-auth';
 
-const CRON_SECRET = process.env.CRON_SECRET ?? 'nextern-cron-2026';
 const REMINDER_WINDOWS = [
   { key: '3d', maxHours: 72, daysLeft: 3 },
   { key: '2d', maxHours: 48, daysLeft: 2 },
@@ -20,8 +20,7 @@ function resolveReminderWindow(targetDate: Date, now: Date) {
 }
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret') ?? req.nextUrl.searchParams.get('secret');
-  if (secret !== CRON_SECRET) {
+  if (!isAuthorizedCronRequest(req)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

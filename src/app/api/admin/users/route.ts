@@ -56,8 +56,8 @@ export async function GET(req: NextRequest) {
     if (status && status !== 'all') query.verificationStatus = status;
     if (typeof premium === 'boolean') query.isPremium = premium;
     if (typeof emailVerified === 'boolean') query.isVerified = emailVerified;
-    if (university) query.university = { $regex: university, $options: 'i' };
-    if (department) query.department = { $regex: department, $options: 'i' };
+    if (university) query.university = buildSearchRegex(university);
+    if (department) query.department = buildSearchRegex(department);
     if (searchRegex) {
       query.$or = [
         { name: searchRegex },

@@ -86,11 +86,32 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Create user ───────────────────────────────────────────────────────
+    const fieldsToUnset =
+      data.role === 'student'
+        ? {
+            companyName: 1,
+            industry: 1,
+            tradeLicenseNo: 1,
+            headquartersCity: 1,
+          }
+        : {
+            university: 1,
+            department: 1,
+            yearOfStudy: 1,
+            studentId: 1,
+            opportunityScore: 1,
+            profileCompleteness: 1,
+          };
+
     const user = existing
-      ? await User.findByIdAndUpdate(existing._id, userPayload, {
-          new: true,
-          runValidators: true,
-        })
+      ? await User.findByIdAndUpdate(
+          existing._id,
+          { $set: userPayload, $unset: fieldsToUnset },
+          {
+            new: true,
+            runValidators: true,
+          }
+        )
       : await User.create(userPayload);
 
     if (!user) {
@@ -130,6 +151,15 @@ export async function POST(req: NextRequest) {
       { status: existing ? 200 : 201 }
     );
   } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json({ error: 'Invalid JSON request body.' }, { status: 400 });
+    }
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 11000) {
+      return NextResponse.json(
+        { error: 'An account with this email already exists.' },
+        { status: 409 }
+      );
+    }
     console.error('[REGISTER ERROR]', error);
     return NextResponse.json({ error: 'Registration failed. Please try again.' }, { status: 500 });
   }

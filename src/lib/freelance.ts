@@ -451,6 +451,18 @@ export async function activateFreelanceEscrowFromPayment(params: {
     throw new Error('Payment not found');
   }
 
+  if (
+    payment.type !== 'freelance_escrow' ||
+    payment.userId.toString() !== order.clientId.toString() ||
+    payment.referenceType !== 'FreelanceOrder' ||
+    payment.referenceId?.toString() !== order._id.toString() ||
+    payment.amountBDT !== order.agreedPriceBDT ||
+    payment.method !== params.method ||
+    !['initiated', 'success'].includes(payment.status)
+  ) {
+    throw new Error('Payment record does not match the freelance order');
+  }
+
   if (order.escrowStatus === 'held' && order.paymentId) {
     await recordClientFreelanceSpendIfNeeded({
       _id: order._id,

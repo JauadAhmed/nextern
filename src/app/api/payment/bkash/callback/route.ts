@@ -48,7 +48,24 @@ export async function GET(req: NextRequest) {
     }
 
     const plan = planId ? PLANS[planId] : null;
-    if (!plan || !userId || !paymentDbId || !mongoose.Types.ObjectId.isValid(userId)) {
+    if (
+      !plan ||
+      !userId ||
+      !paymentDbId ||
+      !mongoose.Types.ObjectId.isValid(userId) ||
+      !mongoose.Types.ObjectId.isValid(paymentDbId)
+    ) {
+      return NextResponse.redirect(`${baseUrl}${premiumBase}?payment=error`);
+    }
+
+    const payment = await Payment.findOne({
+      _id: paymentDbId,
+      userId,
+      type: 'subscription',
+      method: 'bkash',
+      bkashPaymentId: paymentID,
+    }).lean();
+    if (!payment) {
       return NextResponse.redirect(`${baseUrl}${premiumBase}?payment=error`);
     }
 

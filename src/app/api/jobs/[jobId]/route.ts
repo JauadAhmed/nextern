@@ -18,6 +18,7 @@ import { Message } from '@/models/Message';
 import { AdminJobUpdateSchema, UpdateJobSchema } from '@/lib/validations';
 import { removeCalendarEvent, syncOwnedEventToCalendar } from '@/lib/calendar';
 import { onJobPosted, onEventCreated } from '@/lib/events';
+import mongoose from 'mongoose';
 
 type Params = { params: Promise<{ jobId: string }> };
 
@@ -30,6 +31,9 @@ async function getAcademicOwnerRole(userId: string) {
 export async function GET(req: NextRequest, { params }: Params) {
   try {
     const { jobId } = await params;
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return NextResponse.json({ error: 'Invalid job ID' }, { status: 400 });
+    }
     await connectDB();
 
     const job = await Job.findById(jobId).lean();
@@ -84,6 +88,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const { jobId } = await params;
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return NextResponse.json({ error: 'Invalid job ID' }, { status: 400 });
+    }
     await connectDB();
 
     const job = await Job.findById(jobId);
@@ -162,6 +169,9 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     }
 
     const { jobId } = await params;
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return NextResponse.json({ error: 'Invalid job ID' }, { status: 400 });
+    }
     await connectDB();
 
     const job = await Job.findById(jobId);

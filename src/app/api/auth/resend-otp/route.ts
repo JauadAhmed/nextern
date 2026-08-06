@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { User } from '@/models/User';
 import { generateOTP } from '@/lib/otp';
-import { sendEmail, otpEmailTemplate } from '@/lib/email';
+import { sendEmail, otpEmailTemplate, passwordResetOtpEmailTemplate } from '@/lib/email';
 import { ResendOTPSchema } from '@/lib/validations';
 import { rateLimit, rateLimits } from '@/lib/rate-limit';
 
@@ -43,12 +43,21 @@ export async function POST(req: NextRequest) {
     const otp = await generateOTP(email, type);
     await sendEmail({
       to: email,
-      subject: 'Your new Nextern verification code',
-      html: otpEmailTemplate(otp, user.name),
+      subject:
+        type === 'password_reset'
+          ? 'Reset your Nextern password'
+          : 'Your new Nextern verification code',
+      html:
+        type === 'password_reset'
+          ? passwordResetOtpEmailTemplate(otp, user.name)
+          : otpEmailTemplate(otp, user.name),
     });
 
     return NextResponse.json({ message: 'A new verification code has been sent to your email.' });
   } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json({ error: 'Invalid JSON request body.' }, { status: 400 });
+    }
     console.error('[RESEND OTP ERROR]', error);
     return NextResponse.json(
       { error: 'Failed to resend code. Please try again.' },

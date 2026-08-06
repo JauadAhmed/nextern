@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   const callbackUrl = req.nextUrl.searchParams.get('callbackUrl');
   const session = await auth();
   const redirectTo =
-    callbackUrl && callbackUrl.startsWith('/')
+    callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')
       ? callbackUrl
       : getDefaultCallbackUrl(session?.user?.role ?? null);
 

@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/db';
 import { AcademicReviewSchema } from '@/lib/validations';
 import { canTeacherAccessStudent, resolveTeacherScope } from '@/lib/opportunity-recommendations';
 import { AcademicReview } from '@/models/AcademicReview';
+import { isValidObjectId } from '@/lib/object-id';
 
 type Params = Promise<{ reviewId: string }>;
 
@@ -36,6 +37,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
     }
 
     const { reviewId } = await params;
+    if (!isValidObjectId(reviewId)) {
+      return NextResponse.json({ error: 'Invalid review ID' }, { status: 400 });
+    }
     await connectDB();
 
     // dept_head can edit any review in their scope; advisor only their own
@@ -89,6 +93,9 @@ export async function DELETE(_req: NextRequest, { params }: { params: Params }) 
     }
 
     const { reviewId } = await params;
+    if (!isValidObjectId(reviewId)) {
+      return NextResponse.json({ error: 'Invalid review ID' }, { status: 400 });
+    }
     await connectDB();
 
     // dept_head can delete any review in their scope; advisor only their own

@@ -643,6 +643,7 @@ export default async function LandingPage() {
         }}
       >
         <div
+          className="landing-nav-inner"
           style={{
             maxWidth: 1200,
             margin: '0 auto',
@@ -711,6 +712,7 @@ export default async function LandingPage() {
               Sign in
             </Link>
             <Link
+              className="landing-get-started"
               href="/register"
               style={{
                 background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
@@ -738,6 +740,7 @@ export default async function LandingPage() {
 
       {/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <section
+        className="landing-hero"
         style={{
           background: '#0F172A',
           padding: '100px 0 120px',
@@ -804,9 +807,10 @@ export default async function LandingPage() {
             className="hero-grid"
           >
             {/* Left */}
-            <div>
+            <div className="hero-copy" style={{ minWidth: 0 }}>
               {/* Pill badge */}
               <div
+                className="hero-badge"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -840,6 +844,7 @@ export default async function LandingPage() {
               </div>
 
               <h1
+                className="hero-heading"
                 style={{
                   fontSize: 'clamp(38px, 4.5vw, 64px)',
                   fontWeight: 900,
@@ -879,7 +884,10 @@ export default async function LandingPage() {
               </p>
 
               {/* CTA Buttons */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 52 }}>
+              <div
+                className="hero-actions"
+                style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 52 }}
+              >
                 <Link
                   href="/register"
                   style={{
@@ -928,7 +936,10 @@ export default async function LandingPage() {
               </div>
 
               {/* Social proof */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div
+                className="hero-social-proof"
+                style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}
+              >
                 <div style={{ display: 'flex' }}>
                   {['#2563EB', '#7C3AED', '#059669', '#DC2626', '#D97706'].map((bg, i) => (
                     <div
@@ -2317,6 +2328,16 @@ export default async function LandingPage() {
         @media (max-width: 600px) {
           .features-grid { grid-template-columns: 1fr !important; }
           .stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .landing-nav-inner { padding: 0 16px !important; }
+          .landing-get-started { display: none !important; }
+          .landing-hero { padding: 72px 0 88px !important; }
+          .hero-copy { width: 100% !important; min-width: 0 !important; }
+          .hero-badge { max-width: 100% !important; }
+          .hero-heading { font-size: 34px !important; letter-spacing: -1px !important; }
+          .hero-actions { flex-direction: column !important; align-items: stretch !important; }
+          .hero-actions > a { justify-content: center !important; }
+          .hero-social-proof { align-items: flex-start !important; }
+          .hero-social-proof > div:last-child { min-width: 0 !important; }
         }
         .landing-nav-link:hover { color: #fff !important; }
         .landing-feature-card:hover {

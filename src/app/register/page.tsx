@@ -824,8 +824,11 @@ export default function RegisterPage() {
 
       {/* ── RIGHT FORM PANEL ─────────────────────────────────────── */}
       <div
+        className="auth-form-panel"
         style={{
           flex: 1,
+          width: '100%',
+          minWidth: 0,
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
@@ -886,6 +889,7 @@ export default function RegisterPage() {
                 </div>
                 {idx < 2 && (
                   <div
+                    className="register-step-connector"
                     style={{
                       width: 56,
                       height: 2,
@@ -1275,16 +1279,17 @@ export default function RegisterPage() {
                             }}
                           />
                         </Field>
-                        <Field name="yearOfStudy" label="Year of Study">
+                        <Field name="yearOfStudy" label="Year of Study" error={errors.yearOfStudy}>
                           <SelectWrapper>
                             <select
                               value={form.yearOfStudy}
                               onChange={(e) => set('yearOfStudy', e.target.value)}
                               onFocus={() => setFocusedField('year')}
                               onBlur={() => setFocusedField(null)}
+                              required
                               style={{
-                                ...inputStyle(false, false),
-                                ...focusStyle('year'),
+                                ...inputStyle(false, !!errors.yearOfStudy),
+                                ...focusStyle('year', !!errors.yearOfStudy),
                                 paddingRight: 36,
                               }}
                             >
@@ -1497,13 +1502,13 @@ export default function RegisterPage() {
                   }}
                 >
                   By creating an account, you agree to our{' '}
-                  <a href="#" style={{ color: '#64748B', textDecoration: 'underline' }}>
+                  <Link href="/terms" style={{ color: '#64748B', textDecoration: 'underline' }}>
                     Terms of Service
-                  </a>{' '}
+                  </Link>{' '}
                   and{' '}
-                  <a href="#" style={{ color: '#64748B', textDecoration: 'underline' }}>
+                  <Link href="/privacy" style={{ color: '#64748B', textDecoration: 'underline' }}>
                     Privacy Policy
-                  </a>
+                  </Link>
                   .
                 </p>
               </form>
@@ -1514,7 +1519,11 @@ export default function RegisterPage() {
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 768px) { .brand-panel { display: none !important; } }
+        @media (max-width: 768px) {
+          .brand-panel { display: none !important; }
+          .auth-form-panel { padding: 40px 18px !important; }
+          .register-step-connector { width: 36px !important; }
+        }
         select option { background: #fff; color: #0F172A; }
       `}</style>
     </div>

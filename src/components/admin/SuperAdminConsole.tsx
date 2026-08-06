@@ -1291,7 +1291,11 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                         <LoaderCircle className={styles.spin} size={20} />
                       </div>
                     ) : (
-                      <ResponsiveContainer width="100%" height={280}>
+                      <ResponsiveContainer
+                        width="100%"
+                        height={280}
+                        initialDimension={{ width: 800, height: 280 }}
+                      >
                         <AreaChart data={overview?.activity?.applications ?? []}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#dbe4ef" />
                           <XAxis dataKey="label" tick={{ fill: '#5b6b81', fontSize: 12 }} />
@@ -1317,7 +1321,11 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                         <LoaderCircle className={styles.spin} size={20} />
                       </div>
                     ) : (
-                      <ResponsiveContainer width="100%" height={280}>
+                      <ResponsiveContainer
+                        width="100%"
+                        height={280}
+                        initialDimension={{ width: 800, height: 280 }}
+                      >
                         <BarChart data={overview?.activity?.revenue ?? []}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#dbe4ef" />
                           <XAxis dataKey="label" tick={{ fill: '#5b6b81', fontSize: 12 }} />
@@ -1343,7 +1351,11 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                         <LoaderCircle className={styles.spin} size={20} />
                       </div>
                     ) : (
-                      <ResponsiveContainer width="100%" height={280}>
+                      <ResponsiveContainer
+                        width="100%"
+                        height={280}
+                        initialDimension={{ width: 800, height: 280 }}
+                      >
                         <BarChart data={overview?.activity?.freelanceGmv ?? []}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#dbe4ef" />
                           <XAxis dataKey="label" tick={{ fill: '#5b6b81', fontSize: 12 }} />
@@ -1367,7 +1379,11 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                   </div>
                   <div className={styles.chartWrapSmall}>
                     {overview?.breakdowns?.userRoles?.length ? (
-                      <ResponsiveContainer width="100%" height={260}>
+                      <ResponsiveContainer
+                        width="100%"
+                        height={260}
+                        initialDimension={{ width: 800, height: 260 }}
+                      >
                         <PieChart>
                           <Pie
                             data={overview.breakdowns.userRoles.map((row: any) => ({
@@ -4235,7 +4251,11 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                     </div>
                   </div>
                   <div className={styles.chartWrap}>
-                    <ResponsiveContainer width="100%" height={280}>
+                    <ResponsiveContainer
+                      width="100%"
+                      height={280}
+                      initialDimension={{ width: 800, height: 280 }}
+                    >
                       <AreaChart data={overview?.activity?.users ?? []}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#dbe4ef" />
                         <XAxis dataKey="label" tick={{ fill: '#5b6b81', fontSize: 12 }} />
@@ -4255,7 +4275,11 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                     </div>
                   </div>
                   <div className={styles.chartWrapSmall}>
-                    <ResponsiveContainer width="100%" height={260}>
+                    <ResponsiveContainer
+                      width="100%"
+                      height={260}
+                      initialDimension={{ width: 800, height: 260 }}
+                    >
                       <BarChart
                         data={(overview?.breakdowns?.applicationStatuses ?? []).map((row: any) => ({
                           label: normalizeLabel(row._id),

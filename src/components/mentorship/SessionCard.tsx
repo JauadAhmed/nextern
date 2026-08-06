@@ -28,6 +28,7 @@ interface Session {
   durationMinutes: number;
   agoraChannelId?: string;
   completedAt?: string;
+  studentRating?: number;
 }
 
 interface Props {
@@ -181,25 +182,24 @@ export default function SessionCard({ session, role, onAction, onJoinVideo }: Pr
               Cancel
             </button>
           )}
-          {role === 'student' &&
-            ['completed', 'rejected', 'cancelled'].includes(session.status) && (
-              <button
-                onClick={() => onAction(session._id, 'rate')}
-                style={{
-                  padding: '6px 14px',
-                  background: '#F59E0B',
-                  color: '#FFFFFF',
-                  borderRadius: 8,
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  boxShadow: '0 2px 4px rgba(245,158,11,0.2)',
-                }}
-              >
-                Leave Review
-              </button>
-            )}
+          {role === 'student' && session.status === 'completed' && !session.studentRating && (
+            <button
+              onClick={() => onAction(session._id, 'rate')}
+              style={{
+                padding: '6px 14px',
+                background: '#F59E0B',
+                color: '#FFFFFF',
+                borderRadius: 8,
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 13,
+                fontWeight: 600,
+                boxShadow: '0 2px 4px rgba(245,158,11,0.2)',
+              }}
+            >
+              Leave Review
+            </button>
+          )}
         </div>
       </div>
 

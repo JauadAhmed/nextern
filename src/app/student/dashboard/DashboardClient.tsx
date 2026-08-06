@@ -746,7 +746,11 @@ export default function DashboardClient({
               description="How your applications are distributed across the pipeline right now."
             >
               <div style={{ width: '100%', height: 108 }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                  initialDimension={{ width: 600, height: 280 }}
+                >
                   <BarChart
                     data={pipelineChartData}
                     layout="vertical"
@@ -1085,7 +1089,11 @@ export default function DashboardClient({
               >
                 {data.scoreHistory.length > 0 ? (
                   <div style={{ width: '100%', height: 168 }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                      initialDimension={{ width: 600, height: 280 }}
+                    >
                       <AreaChart
                         data={data.scoreHistory}
                         margin={{ top: 8, right: 8, left: -24, bottom: 0 }}
@@ -1504,7 +1512,11 @@ export default function DashboardClient({
                       className="dashboard-donut-row"
                     >
                       <div style={{ position: 'relative', width: 176, height: 176, flexShrink: 0 }}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer
+                          width="100%"
+                          height="100%"
+                          initialDimension={{ width: 600, height: 280 }}
+                        >
                           <PieChart>
                             <Pie
                               data={skillGapChartData}
