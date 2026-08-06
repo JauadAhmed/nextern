@@ -4,12 +4,10 @@ import { AdvisorAction } from '@/models/AdvisorAction';
 import { Notification } from '@/models/Notification';
 import { User } from '@/models/User';
 import { createNotification } from '@/lib/notify';
-
-const CRON_SECRET = process.env.CRON_SECRET ?? 'nextern-cron-2026';
+import { isAuthorizedCronRequest } from '@/lib/cron-auth';
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret') ?? req.nextUrl.searchParams.get('secret');
-  if (secret !== CRON_SECRET) {
+  if (!isAuthorizedCronRequest(req)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

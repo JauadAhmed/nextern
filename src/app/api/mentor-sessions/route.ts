@@ -6,6 +6,7 @@ import { Mentor } from '@/models/Mentor';
 import { checkFeatureAccess } from '@/lib/premium';
 import { notifyMentorshipRequest } from '@/lib/notify';
 import mongoose from 'mongoose';
+import { MentorSessionRequestSchema } from '@/lib/validations';
 
 export async function GET(req: NextRequest) {
   try {
@@ -62,12 +63,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Only students can request mentorship' }, { status: 403 });
     }
 
-    const body = await req.json();
-    const { mentorId, sessionType, studentNotes } = body;
-
-    if (!mentorId || !sessionType || !studentNotes) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const parsed = MentorSessionRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
     }
+    const { mentorId, sessionType, studentNotes } = parsed.data;
 
     await connectDB();
 
@@ -80,6 +84,12 @@ export async function POST(req: NextRequest) {
     const mentor = await Mentor.findById(mentorId).populate('userId', 'name').lean();
     if (!mentor) {
       return NextResponse.json({ error: 'Mentor not found' }, { status: 404 });
+    }
+    if (!mentor.isAvailable) {
+      return NextResponse.json(
+        { error: 'Mentor is not currently accepting requests' },
+        { status: 400 }
+      );
     }
 
     // Lazy reset for sessionsThisMonth

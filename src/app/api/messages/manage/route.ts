@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/db';
 import { Message } from '@/models/Message';
 import mongoose from 'mongoose';
 import Pusher from 'pusher';
+import { EditMessageSchema } from '@/lib/validations';
 
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
@@ -20,14 +21,15 @@ export async function PATCH(req: NextRequest) {
 
   await connectDB();
 
-  const { messageId, content } = await req.json();
-
-  if (!messageId || !mongoose.Types.ObjectId.isValid(messageId)) {
-    return NextResponse.json({ error: 'Valid messageId is required' }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  const parsed = EditMessageSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
   }
-  if (!content?.trim()) {
-    return NextResponse.json({ error: 'Content cannot be empty' }, { status: 400 });
-  }
+  const { messageId, content } = parsed.data;
 
   const message = await Message.findById(messageId);
   if (!message) return NextResponse.json({ error: 'Message not found' }, { status: 404 });
@@ -42,7 +44,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Edit limit reached' }, { status: 400 });
   }
 
-  message.content = content.trim();
+  message.content = content;
   message.editCount = (message.editCount || 0) + 1;
   await message.save();
 

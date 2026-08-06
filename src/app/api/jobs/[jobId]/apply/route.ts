@@ -17,6 +17,7 @@ import {
   syncJobDeadlineToCalendar,
   syncEventRegistrationToCalendar,
 } from '@/lib/calendar';
+import mongoose from 'mongoose';
 
 type Params = { params: Promise<{ jobId: string }> };
 
@@ -34,6 +35,9 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     const { jobId } = await params;
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return NextResponse.json({ error: 'Invalid job ID' }, { status: 400 });
+    }
     await connectDB();
 
     const job = await Job.findById(jobId);

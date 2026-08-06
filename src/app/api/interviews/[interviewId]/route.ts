@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/db';
 import { InterviewUpdateSchema } from '@/lib/validations';
 import { updateInterviewSession } from '@/lib/hiring-suite';
 import { InterviewSession } from '@/models/InterviewSession';
+import { isValidObjectId } from '@/lib/object-id';
 
 type Params = { params: Promise<{ interviewId: string }> };
 
@@ -15,6 +16,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
     }
 
     const { interviewId } = await params;
+    if (!isValidObjectId(interviewId)) {
+      return NextResponse.json({ error: 'Invalid interview ID' }, { status: 400 });
+    }
     await connectDB();
 
     const interview = await InterviewSession.findById(interviewId)
@@ -67,6 +71,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const { interviewId } = await params;
+    if (!isValidObjectId(interviewId)) {
+      return NextResponse.json({ error: 'Invalid interview ID' }, { status: 400 });
+    }
     const actorRole = session.user.role === 'student' ? 'student' : 'employer';
     const interview = await updateInterviewSession({
       interviewId,

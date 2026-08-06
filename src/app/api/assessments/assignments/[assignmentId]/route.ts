@@ -10,6 +10,7 @@ import {
 import { AssessmentAssignment } from '@/models/AssessmentAssignment';
 import { Assessment } from '@/models/Assessment';
 import { AssessmentSubmission } from '@/models/AssessmentSubmission';
+import { isValidObjectId } from '@/lib/object-id';
 
 type Params = { params: Promise<{ assignmentId: string }> };
 
@@ -21,6 +22,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
     }
 
     const { assignmentId } = await params;
+    if (!isValidObjectId(assignmentId)) {
+      return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
+    }
     await connectDB();
     await syncAssessmentAssignmentState(assignmentId);
 
@@ -104,6 +108,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const { assignmentId } = await params;
+    if (!isValidObjectId(assignmentId)) {
+      return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
+    }
     const submission = await saveAssessmentDraft({
       assignmentId,
       studentId: session.user.id,

@@ -74,6 +74,9 @@ export async function POST(req: NextRequest) {
         requiresAdminApproval(user.role) && user.verificationStatus === 'pending',
     });
   } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json({ error: 'Invalid JSON request body.' }, { status: 400 });
+    }
     console.error('[VERIFY EMAIL ERROR]', error);
     return NextResponse.json({ error: 'Verification failed. Please try again.' }, { status: 500 });
   }

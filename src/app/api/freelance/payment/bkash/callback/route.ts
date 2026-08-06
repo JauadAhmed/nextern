@@ -39,6 +39,24 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(`${baseUrl}${workspaceHref}?payment=failed`);
     }
 
+    if (
+      !mongoose.Types.ObjectId.isValid(paymentDbId) ||
+      !mongoose.Types.ObjectId.isValid(orderId)
+    ) {
+      return NextResponse.redirect(`${baseUrl}${workspaceHref}?payment=error`);
+    }
+
+    const payment = await Payment.findOne({
+      _id: paymentDbId,
+      type: 'freelance_escrow',
+      method: 'bkash',
+      referenceId: orderId,
+      bkashPaymentId: paymentID,
+    }).lean();
+    if (!payment) {
+      return NextResponse.redirect(`${baseUrl}${workspaceHref}?payment=error`);
+    }
+
     const executeResult = await executeBkashPayment(paymentID);
     if (executeResult.transactionStatus !== 'Completed') {
       await Payment.findByIdAndUpdate(paymentDbId, { status: 'failed' }).catch(() => {});

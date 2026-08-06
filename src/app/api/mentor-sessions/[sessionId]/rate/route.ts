@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
 import { MentorSession } from '@/models/MentorSession';
 import { Mentor } from '@/models/Mentor';
+import { isValidObjectId } from '@/lib/object-id';
+import { MentorSessionRatingSchema } from '@/lib/validations';
 
 type Params = { params: Promise<{ sessionId: string }> };
 
@@ -14,12 +16,18 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     const { sessionId } = await params;
-    const body = await req.json();
-    const { rating, review } = body;
-
-    if (!rating || rating < 1 || rating > 5) {
-      return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
+    if (!isValidObjectId(sessionId)) {
+      return NextResponse.json({ error: 'Invalid session ID' }, { status: 400 });
     }
+    const body = await req.json().catch(() => ({}));
+    const parsed = MentorSessionRatingSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+    const { rating, review } = parsed.data;
 
     await connectDB();
 

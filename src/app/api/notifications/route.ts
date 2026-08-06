@@ -10,6 +10,8 @@ import { auth } from '@/lib/auth';
 import { connectDB } from '@/lib/db';
 import { Notification } from '@/models/Notification';
 import { pusherServer, userChannel, PUSHER_EVENTS } from '@/lib/pusher';
+import { parsePaginationParams } from '@/lib/pagination';
+import mongoose from 'mongoose';
 
 const ALLOWED_TYPES = new Set([
   'job_match',
@@ -39,8 +41,10 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
-    const limit = Math.min(50, parseInt(searchParams.get('limit') ?? '20'));
+    const { page, limit, skip } = parsePaginationParams(searchParams, {
+      defaultLimit: 20,
+      maxLimit: 50,
+    });
     const unreadOnly = searchParams.get('unread') === 'true';
     const type = searchParams.get('type');
 
@@ -63,11 +67,7 @@ export async function GET(req: NextRequest) {
     }
 
     const [notifications, total, unreadCount] = await Promise.all([
-      Notification.find(query)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean(),
+      Notification.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
       Notification.countDocuments(query),
       // Always count ALL unread regardless of current filter
       Notification.countDocuments({ userId: session.user.id, isRead: false }),
@@ -99,6 +99,10 @@ export async function PATCH(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const notifId = searchParams.get('id');
+
+    if (notifId && !mongoose.Types.ObjectId.isValid(notifId)) {
+      return NextResponse.json({ error: 'Invalid notification ID' }, { status: 400 });
+    }
 
     await connectDB();
 
@@ -144,6 +148,10 @@ export async function DELETE(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const notifId = searchParams.get('id');
+
+    if (notifId && !mongoose.Types.ObjectId.isValid(notifId)) {
+      return NextResponse.json({ error: 'Invalid notification ID' }, { status: 400 });
+    }
 
     await connectDB();
 

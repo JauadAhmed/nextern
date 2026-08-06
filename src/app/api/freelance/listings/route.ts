@@ -7,6 +7,11 @@ import { VERIFIED_FREELANCER_BADGE_SLUG, calculateFreelancePayout } from '@/lib/
 import { FreelanceListingSchema } from '@/lib/validations';
 import { BadgeAward } from '@/models/BadgeAward';
 import { FreelanceListing } from '@/models/FreelanceListing';
+import { parsePaginationParams } from '@/lib/pagination';
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 function serializeListing(
   listing: Record<string, any>,
@@ -57,8 +62,10 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const page = Math.max(1, Number.parseInt(searchParams.get('page') ?? '1', 10));
-    const limit = Math.min(24, Math.max(1, Number.parseInt(searchParams.get('limit') ?? '12', 10)));
+    const { page, limit, skip } = parsePaginationParams(searchParams, {
+      defaultLimit: 12,
+      maxLimit: 24,
+    });
     const mine = searchParams.get('mine') === 'true';
     const search = (searchParams.get('search') ?? '').trim();
     const category = (searchParams.get('category') ?? '').trim();
@@ -81,7 +88,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (skill) {
-      query.skills = { $in: [new RegExp(skill, 'i')] };
+      query.skills = { $in: [new RegExp(escapeRegExp(skill), 'i')] };
     }
 
     if (Number.isFinite(minBudget) || Number.isFinite(maxBudget)) {
@@ -91,7 +98,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (search) {
-      const regex = new RegExp(search, 'i');
+      const regex = new RegExp(escapeRegExp(search), 'i');
       query.$or = [{ title: regex }, { description: regex }, { skills: regex }];
     }
 
@@ -99,7 +106,7 @@ export async function GET(req: NextRequest) {
       FreelanceListing.find(query)
         .populate('studentId', 'name image university department skills opportunityScore')
         .sort({ isActive: -1, averageRating: -1, totalOrdersCompleted: -1, createdAt: -1 })
-        .skip((page - 1) * limit)
+        .skip(skip)
         .limit(limit)
         .lean(),
       FreelanceListing.countDocuments(query),

@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import AgoraRTC, {
+import type {
   ICameraVideoTrack,
   IMicrophoneAudioTrack,
   IAgoraRTCClient,
@@ -45,9 +45,15 @@ export default function VideoCallClient() {
     }
 
     let isMounted = true;
+    let activeClient: IAgoraRTCClient | null = null;
+    let activeTracks: [IMicrophoneAudioTrack, ICameraVideoTrack] | null = null;
 
     const initAgora = async () => {
+      const { default: AgoraRTC } = await import('agora-rtc-sdk-ng');
+      if (!isMounted) return;
+
       const agoraClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+      activeClient = agoraClient;
       if (isMounted) setClient(agoraClient);
 
       agoraClient.on('user-published', async (user, mediaType) => {
@@ -91,6 +97,7 @@ export default function VideoCallClient() {
       try {
         await agoraClient.join(appId, channel, token, uid);
         const tracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+        activeTracks = tracks;
         if (isMounted) {
           setLocalTracks(tracks);
           await agoraClient.publish(tracks);
@@ -113,9 +120,14 @@ export default function VideoCallClient() {
 
     return () => {
       isMounted = false;
-      leaveCall(true);
+      if (activeTracks) {
+        activeTracks[0].stop();
+        activeTracks[0].close();
+        activeTracks[1].stop();
+        activeTracks[1].close();
+      }
+      void activeClient?.leave();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appId, channel, token, uid]);
 
   useEffect(() => {

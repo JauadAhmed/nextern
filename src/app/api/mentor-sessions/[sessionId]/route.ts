@@ -6,6 +6,8 @@ import { Mentor } from '@/models/Mentor';
 import { Message } from '@/models/Message';
 import { notifyMentorshipAccepted } from '@/lib/notify';
 import { onMentorSessionComplete } from '@/lib/events';
+import { isValidObjectId } from '@/lib/object-id';
+import { MentorSessionUpdateSchema } from '@/lib/validations';
 
 type Params = { params: Promise<{ sessionId: string }> };
 
@@ -21,8 +23,18 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const { sessionId } = await params;
-    const body = await req.json();
-    const { status, scheduledAt, durationMinutes } = body;
+    if (!isValidObjectId(sessionId)) {
+      return NextResponse.json({ error: 'Invalid session ID' }, { status: 400 });
+    }
+    const body = await req.json().catch(() => ({}));
+    const parsed = MentorSessionUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+    const { status, scheduledAt, durationMinutes } = parsed.data;
 
     await connectDB();
 
@@ -47,9 +59,15 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       if (!isMentor) {
         return NextResponse.json({ error: 'Only mentor can accept' }, { status: 403 });
       }
-      if (!scheduledAt) {
+      if (mentorSession.status !== 'pending') {
         return NextResponse.json(
-          { error: 'scheduledAt is required to accept a session' },
+          { error: 'Only pending sessions can be accepted' },
+          { status: 409 }
+        );
+      }
+      if (!scheduledAt || new Date(scheduledAt) <= new Date()) {
+        return NextResponse.json(
+          { error: 'Session must be scheduled in the future' },
           { status: 400 }
         );
       }
@@ -99,17 +117,29 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       if (!isMentor) {
         return NextResponse.json({ error: 'Only mentor can reject' }, { status: 403 });
       }
+      if (mentorSession.status !== 'pending') {
+        return NextResponse.json(
+          { error: 'Only pending sessions can be rejected' },
+          { status: 409 }
+        );
+      }
       mentorSession.status = 'rejected';
       await mentorSession.save();
       return NextResponse.json(mentorSession);
     }
 
     if (status === 'completed') {
-      if (!isMentor && !isStudent) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      if (!isMentor) {
+        return NextResponse.json(
+          { error: 'Only the mentor can complete a session' },
+          { status: 403 }
+        );
       }
-      if (mentorSession.status === 'completed') {
-        return NextResponse.json({ error: 'Already completed' }, { status: 400 });
+      if (!['accepted', 'scheduled'].includes(mentorSession.status)) {
+        return NextResponse.json(
+          { error: 'Only accepted or scheduled sessions can be completed' },
+          { status: 409 }
+        );
       }
 
       mentorSession.status = 'completed';
@@ -130,6 +160,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     if (status === 'cancelled') {
+      if (!['pending', 'accepted', 'scheduled'].includes(mentorSession.status)) {
+        return NextResponse.json(
+          { error: 'This session can no longer be cancelled' },
+          { status: 409 }
+        );
+      }
       mentorSession.status = 'cancelled';
       await mentorSession.save();
       return NextResponse.json(mentorSession);

@@ -5,6 +5,7 @@ import { notifyRecommendationRequestDecision } from '@/lib/notify';
 import { EmployerRecommendationRequestDecisionSchema } from '@/lib/validations';
 import { OpportunityRecommendation } from '@/models/OpportunityRecommendation';
 import { User } from '@/models/User';
+import { isValidObjectId } from '@/lib/object-id';
 
 type Params = Promise<{ recommendationId: string }>;
 
@@ -28,6 +29,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
     }
 
     const { recommendationId } = await params;
+    if (!isValidObjectId(recommendationId)) {
+      return NextResponse.json({ error: 'Invalid recommendation ID' }, { status: 400 });
+    }
 
     await connectDB();
 

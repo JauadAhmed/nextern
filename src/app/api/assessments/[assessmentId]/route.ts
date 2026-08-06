@@ -16,6 +16,7 @@ import {
 import { Assessment } from '@/models/Assessment';
 import { AssessmentAssignment } from '@/models/AssessmentAssignment';
 import { AssessmentSubmission } from '@/models/AssessmentSubmission';
+import { isValidObjectId } from '@/lib/object-id';
 
 type Params = { params: Promise<{ assessmentId: string }> };
 
@@ -27,6 +28,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
     }
 
     const { assessmentId } = await params;
+    if (!isValidObjectId(assessmentId)) {
+      return NextResponse.json({ error: 'Invalid assessment ID' }, { status: 400 });
+    }
     await connectDB();
 
     const pendingAssignmentIds = await AssessmentAssignment.find({
@@ -93,6 +97,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const { assessmentId } = await params;
+    if (!isValidObjectId(assessmentId)) {
+      return NextResponse.json({ error: 'Invalid assessment ID' }, { status: 400 });
+    }
     const body = await req.json();
 
     if (body?.action === 'grade_assignment') {
@@ -215,6 +222,9 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     }
 
     const { assessmentId } = await params;
+    if (!isValidObjectId(assessmentId)) {
+      return NextResponse.json({ error: 'Invalid assessment ID' }, { status: 400 });
+    }
     await connectDB();
 
     const assessment = await Assessment.findOne({

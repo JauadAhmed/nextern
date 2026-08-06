@@ -10,6 +10,7 @@ import { sendEmail } from '@/lib/email';
 import { getLoginUrl } from '@/lib/app-url';
 import { AdminApproveSchema } from '@/lib/validations';
 import { onProfileVerified } from '@/lib/events';
+import { isValidObjectId } from '@/lib/object-id';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
@@ -19,6 +20,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ us
     }
 
     const { userId } = await params;
+    if (!isValidObjectId(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
+    }
 
     const body = await req.json();
     const parsed = AdminApproveSchema.safeParse({ ...body, userId });

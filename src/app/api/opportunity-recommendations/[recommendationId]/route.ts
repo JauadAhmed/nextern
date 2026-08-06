@@ -5,6 +5,7 @@ import { OpportunityRecommendationSchema } from '@/lib/validations';
 import { canTeacherAccessStudent, resolveTeacherScope } from '@/lib/opportunity-recommendations';
 import { Job } from '@/models/Job';
 import { OpportunityRecommendation } from '@/models/OpportunityRecommendation';
+import { isValidObjectId } from '@/lib/object-id';
 
 type Params = Promise<{ recommendationId: string }>;
 
@@ -34,6 +35,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
     }
 
     const { recommendationId } = await params;
+    if (!isValidObjectId(recommendationId)) {
+      return NextResponse.json({ error: 'Invalid recommendation ID' }, { status: 400 });
+    }
     await connectDB();
 
     // dept_head can edit any recommendation in their scope; advisor only their own
@@ -117,6 +121,9 @@ export async function DELETE(_req: NextRequest, { params }: { params: Params }) 
     }
 
     const { recommendationId } = await params;
+    if (!isValidObjectId(recommendationId)) {
+      return NextResponse.json({ error: 'Invalid recommendation ID' }, { status: 400 });
+    }
     await connectDB();
 
     // dept_head can delete any recommendation in their scope; advisor only their own

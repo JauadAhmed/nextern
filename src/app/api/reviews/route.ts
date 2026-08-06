@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/db';
 import { Review } from '@/models/Review';
 import { Application } from '@/models/Application';
 import { evaluateBadges } from '@/lib/badge-engine';
+import { JobReviewSchema } from '@/lib/validations';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,24 +14,16 @@ export async function POST(req: NextRequest) {
     }
 
     await connectDB();
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const parsed = JobReviewSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
 
-    const {
-      revieweeId,
-      applicationId,
-      reviewType,
-      overallRating,
-      workEnvironmentRating,
-      learningOpportunityRating,
-      mentorshipQualityRating,
-      comment,
-      professionalismRating,
-      punctualityRating,
-      skillPerformanceRating,
-      workQualityRating,
-      isRecommended,
-      recommendationText,
-    } = body;
+    const { applicationId, reviewType, revieweeId } = parsed.data;
 
     // Validate Application Status
     const application = await Application.findById(applicationId);
@@ -45,73 +38,64 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Role check
-    if (
-      reviewType === 'student_to_employer' &&
-      session.user.id !== application.studentId.toString()
-    ) {
+    const expectedReviewerId =
+      reviewType === 'student_to_employer'
+        ? application.studentId.toString()
+        : application.employerId.toString();
+    const expectedRevieweeId =
+      reviewType === 'student_to_employer'
+        ? application.employerId.toString()
+        : application.studentId.toString();
+
+    if (session.user.id !== expectedReviewerId) {
       return NextResponse.json(
-        { error: 'Only the hired student can leave this review' },
+        {
+          error:
+            reviewType === 'student_to_employer'
+              ? 'Only the hired student can leave this review'
+              : 'Only the employer can leave this review',
+        },
         { status: 403 }
       );
     }
 
-    if (
-      reviewType === 'employer_to_student' &&
-      session.user.id !== application.employerId.toString()
-    ) {
+    if (revieweeId !== expectedRevieweeId) {
       return NextResponse.json(
-        { error: 'Only the employer can leave this review' },
-        { status: 403 }
+        { error: 'Review recipient does not match application' },
+        { status: 400 }
       );
     }
 
     const review = await Review.findOneAndUpdate(
       { applicationId, reviewType },
       {
+        ...parsed.data,
         reviewerId: session.user.id,
-        revieweeId,
-        overallRating,
-        workEnvironmentRating,
-        learningOpportunityRating,
-        mentorshipQualityRating,
-        comment,
-        professionalismRating,
-        punctualityRating,
-        skillPerformanceRating,
-        workQualityRating,
-        isRecommended,
-        recommendationText,
+        revieweeId: expectedRevieweeId,
         isVerified: true,
         isPublic: true,
       },
       { new: true, upsert: true }
     );
 
-    // Async Trigger Badges
-    process.nextTick(async () => {
-      try {
-        if (reviewType === 'student_to_employer') {
-          // The student submitted a review: possibly community-leader badge
-          await evaluateBadges(session.user.id, 'onReviewSubmitted', 'student');
-          // Employer received a review: possibly trusted-recruiter / campus-favorite badge
-          await evaluateBadges(revieweeId, 'onReviewReceived', 'employer');
-        } else if (reviewType === 'employer_to_student') {
-          // Employer submitted a review
-          await evaluateBadges(session.user.id, 'onReviewSubmitted', 'employer');
-          // Student received a review: possibly verified-work-record badge
-          await evaluateBadges(revieweeId, 'onReviewReceived', 'student');
-        }
-      } catch (err) {
-        console.error('Badge evaluation error on review:', err);
+    const badgeResults =
+      reviewType === 'student_to_employer'
+        ? await Promise.allSettled([
+            evaluateBadges(session.user.id, 'onReviewSubmitted', 'student'),
+            evaluateBadges(expectedRevieweeId, 'onReviewReceived', 'employer'),
+          ])
+        : await Promise.allSettled([
+            evaluateBadges(session.user.id, 'onReviewSubmitted', 'employer'),
+            evaluateBadges(expectedRevieweeId, 'onReviewReceived', 'student'),
+          ]);
+    for (const result of badgeResults) {
+      if (result.status === 'rejected') {
+        console.error('Badge evaluation error on review:', result.reason);
       }
-    });
+    }
     return NextResponse.json({ success: true, data: review });
   } catch (error: unknown) {
     console.error('Create/Update review error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

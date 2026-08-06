@@ -1,5 +1,5 @@
 import { connectDB } from '@/lib/db';
-import { PLANS, type PlanId } from '@/lib/subscription-plans';
+import { getPlanByRole, PLANS, type PlanId } from '@/lib/subscription-plans';
 import { Payment } from '@/models/Payment';
 import { Subscription } from '@/models/Subscription';
 import { User } from '@/models/User';
@@ -23,6 +23,22 @@ export async function activateSubscriptionFromPayment(params: {
   const payment = await Payment.findById(params.paymentId);
   if (!payment) {
     throw new Error('Payment not found');
+  }
+
+  const user = await User.findById(params.userId).select('role').lean();
+  const rolePlan = user ? getPlanByRole(user.role) : null;
+  if (!user || !rolePlan || rolePlan.id !== plan.id) {
+    throw new Error('Payment plan does not match the account role');
+  }
+
+  if (
+    payment.userId.toString() !== params.userId ||
+    payment.type !== 'subscription' ||
+    payment.amountBDT !== plan.price ||
+    payment.method !== params.method ||
+    !['initiated', 'success'].includes(payment.status)
+  ) {
+    throw new Error('Payment record does not match the subscription request');
   }
 
   if (payment.referenceType === 'Subscription' && payment.referenceId) {

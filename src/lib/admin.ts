@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth';
+import { parsePaginationParams } from '@/lib/pagination';
 
 export async function requireAdminSession() {
   const session = await auth();
@@ -13,20 +14,7 @@ export function parsePagination(
   searchParams: URLSearchParams,
   options?: { defaultPage?: number; defaultLimit?: number; maxLimit?: number }
 ) {
-  const defaultPage = options?.defaultPage ?? 1;
-  const defaultLimit = options?.defaultLimit ?? 20;
-  const maxLimit = options?.maxLimit ?? 50;
-
-  const page = Math.max(
-    defaultPage,
-    Number.parseInt(searchParams.get('page') ?? `${defaultPage}`, 10)
-  );
-  const limit = Math.min(
-    maxLimit,
-    Math.max(1, Number.parseInt(searchParams.get('limit') ?? `${defaultLimit}`, 10))
-  );
-
-  return { page, limit, skip: (page - 1) * limit };
+  return parsePaginationParams(searchParams, options);
 }
 
 export function parseBooleanParam(value: string | null) {

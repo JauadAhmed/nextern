@@ -34,6 +34,7 @@ const PAGE_LEVEL_SHELL_PREFIXES = [
   '/student/messages',
   '/student/badges',
   '/student/subscription',
+  '/student/premium',
   '/student/mock-interview',
 ];
 

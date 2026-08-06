@@ -10,6 +10,7 @@ import {
 } from '@/lib/hiring-suite';
 import { Assessment } from '@/models/Assessment';
 import { AssessmentAssignment } from '@/models/AssessmentAssignment';
+import { isValidObjectId } from '@/lib/object-id';
 
 export async function GET(req: NextRequest) {
   try {
@@ -20,6 +21,9 @@ export async function GET(req: NextRequest) {
 
     await connectDB();
     const jobId = req.nextUrl.searchParams.get('jobId');
+    if (jobId && !isValidObjectId(jobId)) {
+      return NextResponse.json({ error: 'Invalid job ID' }, { status: 400 });
+    }
 
     if (session.user.role === 'employer') {
       const query: Record<string, unknown> = { employerId: session.user.id };

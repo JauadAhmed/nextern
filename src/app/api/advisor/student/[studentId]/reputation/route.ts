@@ -27,7 +27,7 @@ export async function GET(
       reviewType: 'employer_to_student',
       isPublic: true,
       isVerified: true,
-    }).populate('reviewerId', 'name companyDetails.companyName');
+    }).populate('reviewerId', 'name companyName');
 
     if (reviews.length === 0) {
       return NextResponse.json({
@@ -42,6 +42,10 @@ export async function GET(
     let totalPunctuality = 0;
     let totalSkillPerformance = 0;
     let totalWorkQuality = 0;
+    let professionalismCount = 0;
+    let punctualityCount = 0;
+    let skillPerformanceCount = 0;
+    let workQualityCount = 0;
     let totalRecommendations = 0;
 
     const recommendations: {
@@ -52,10 +56,22 @@ export async function GET(
     }[] = [];
 
     reviews.forEach((r) => {
-      if (r.professionalismRating) totalProfessionalism += r.professionalismRating;
-      if (r.punctualityRating) totalPunctuality += r.punctualityRating;
-      if (r.skillPerformanceRating) totalSkillPerformance += r.skillPerformanceRating;
-      if (r.workQualityRating) totalWorkQuality += r.workQualityRating;
+      if (r.professionalismRating) {
+        totalProfessionalism += r.professionalismRating;
+        professionalismCount++;
+      }
+      if (r.punctualityRating) {
+        totalPunctuality += r.punctualityRating;
+        punctualityCount++;
+      }
+      if (r.skillPerformanceRating) {
+        totalSkillPerformance += r.skillPerformanceRating;
+        skillPerformanceCount++;
+      }
+      if (r.workQualityRating) {
+        totalWorkQuality += r.workQualityRating;
+        workQualityCount++;
+      }
 
       if (r.isRecommended) {
         totalRecommendations++;
@@ -64,20 +80,27 @@ export async function GET(
       if (r.recommendationText) {
         recommendations.push({
           employerName: r.reviewerId?.name,
-          companyName: r.reviewerId?.companyDetails?.companyName,
+          companyName: r.reviewerId?.companyName,
           text: r.recommendationText,
           createdAt: r.createdAt,
         });
       }
     });
 
-    const count = reviews.length;
     const aggregatedStats = {
-      averageProfessionalism: Number((totalProfessionalism / count).toFixed(1)),
-      averagePunctuality: Number((totalPunctuality / count).toFixed(1)),
-      averageSkillPerformance: Number((totalSkillPerformance / count).toFixed(1)),
-      averageWorkQuality: Number((totalWorkQuality / count).toFixed(1)),
-      totalReviews: count,
+      averageProfessionalism: professionalismCount
+        ? Number((totalProfessionalism / professionalismCount).toFixed(1))
+        : 0,
+      averagePunctuality: punctualityCount
+        ? Number((totalPunctuality / punctualityCount).toFixed(1))
+        : 0,
+      averageSkillPerformance: skillPerformanceCount
+        ? Number((totalSkillPerformance / skillPerformanceCount).toFixed(1))
+        : 0,
+      averageWorkQuality: workQualityCount
+        ? Number((totalWorkQuality / workQualityCount).toFixed(1))
+        : 0,
+      totalReviews: reviews.length,
       totalRecommendations,
     };
 
