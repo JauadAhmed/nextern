@@ -313,9 +313,7 @@ export default async function PendingApprovalPage() {
             right: '10%',
             width: 450,
             height: 450,
-            background: isRejected
-              ? 'radial-gradient(circle, rgba(239,68,68,0.04) 0%, transparent 70%)'
-              : 'radial-gradient(circle, rgba(37,99,235,0.05) 0%, transparent 70%)',
+            background: isRejected ? 'rgba(239,68,68,0.035)' : 'rgba(37,99,235,0.04)',
             borderRadius: '50%',
           }}
         />
@@ -326,7 +324,7 @@ export default async function PendingApprovalPage() {
             left: '5%',
             width: 350,
             height: 350,
-            background: 'radial-gradient(circle, rgba(34,211,238,0.04) 0%, transparent 70%)',
+            background: 'rgba(8,145,178,0.035)',
             borderRadius: '50%',
           }}
         />
@@ -404,9 +402,7 @@ export default async function PendingApprovalPage() {
               style={{
                 width: 88,
                 height: 88,
-                background: isRejected
-                  ? 'linear-gradient(135deg, #FEF2F2, #FEE2E2)'
-                  : 'linear-gradient(135deg, #EFF6FF, #DBEAFE)',
+                background: isRejected ? '#FEF2F2' : '#EFF6FF',
                 borderRadius: 24,
                 display: 'inline-flex',
                 alignItems: 'center',

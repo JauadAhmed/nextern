@@ -77,7 +77,7 @@ export default function SetupPasswordClient({ email }: { email: string }) {
         <div
           style={{
             padding: '32px 32px 26px',
-            background: 'linear-gradient(135deg, #1E293B 0%, #2563EB 100%)',
+            background: '#172033',
             color: '#FFFFFF',
           }}
         >
@@ -248,7 +248,7 @@ export default function SetupPasswordClient({ email }: { email: string }) {
                 border: 'none',
                 borderRadius: 14,
                 padding: '14px 18px',
-                background: saving ? '#93C5FD' : 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                background: saving ? '#93C5FD' : '#2563EB',
                 color: '#FFFFFF',
                 fontSize: 15,
                 fontWeight: 800,

@@ -1,8 +1,6 @@
 .page {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(20, 184, 166, 0.12), transparent 28%),
-    linear-gradient(180deg, #eff5fb 0%, #f8fbff 52%, #eef4fb 100%);
+  background: #f4f7fb;
 }
 
 .shell {
@@ -40,18 +38,6 @@
 .brandBlock {
   gap: 14px;
   margin-bottom: 18px;
-}
-
-.brandMark {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #14b8a6, #38bdf8);
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-weight: 800;
-  font-size: 20px;
 }
 
 .brandEyebrow,
@@ -245,7 +231,7 @@
   display: grid;
   place-items: center;
   color: #fff;
-  background: linear-gradient(135deg, #0f766e, #2563eb);
+  background: #0f766e;
   font-weight: 700;
 }
 
@@ -306,6 +292,7 @@
   border: 1px solid transparent;
   cursor: pointer;
   font-weight: 600;
+  min-height: 42px;
 }
 
 .rangeButton {
@@ -316,7 +303,7 @@
 
 .rangeButtonActive,
 .primaryButton {
-  background: linear-gradient(135deg, #0f766e, #2563eb);
+  background: #0f766e;
   color: #fff;
 }
 

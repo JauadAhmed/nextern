@@ -251,7 +251,7 @@ export default function VerifyEmailPage() {
             right: -100,
             width: 400,
             height: 400,
-            background: 'radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%)',
+            background: 'rgba(37,99,235,0.05)',
             borderRadius: '50%',
           }}
         />
@@ -262,7 +262,7 @@ export default function VerifyEmailPage() {
             left: -80,
             width: 350,
             height: 350,
-            background: 'radial-gradient(circle, rgba(34,211,238,0.05) 0%, transparent 70%)',
+            background: 'rgba(8,145,178,0.04)',
             borderRadius: '50%',
           }}
         />
@@ -361,7 +361,7 @@ export default function VerifyEmailPage() {
                   style={{
                     width: 72,
                     height: 72,
-                    background: 'linear-gradient(135deg, #EFF6FF, #DBEAFE)',
+                    background: '#EFF6FF',
                     borderRadius: 20,
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -420,7 +420,7 @@ export default function VerifyEmailPage() {
                       style={{
                         width: `${progress}%`,
                         height: '100%',
-                        background: 'linear-gradient(90deg, #2563EB, #22D3EE)',
+                        background: '#2563EB',
                         borderRadius: 999,
                         transition: 'width 0.2s ease',
                       }}

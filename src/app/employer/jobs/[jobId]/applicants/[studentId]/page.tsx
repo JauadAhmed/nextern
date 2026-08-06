@@ -210,8 +210,7 @@ function PremiumAiGlassLockCard({ fitScore, fitColor }: { fitScore: number; fitC
         overflow: 'hidden',
         borderRadius: 28,
         padding: '1px',
-        background:
-          'linear-gradient(135deg, rgba(255,255,255,0.86), rgba(191,219,254,0.48), rgba(253,230,138,0.42))',
+        background: 'rgba(255,255,255,0.82)',
         boxShadow: '0 24px 70px rgba(15,23,42,0.14), inset 0 1px 0 rgba(255,255,255,0.8)',
       }}
     >
@@ -219,8 +218,7 @@ function PremiumAiGlassLockCard({ fitScore, fitColor }: { fitScore: number; fitC
         style={{
           position: 'absolute',
           inset: -90,
-          background:
-            'radial-gradient(circle at 12% 18%, rgba(37,99,235,0.2), transparent 34%), radial-gradient(circle at 88% 10%, rgba(245,158,11,0.2), transparent 32%), radial-gradient(circle at 52% 92%, rgba(34,211,238,0.16), transparent 35%)',
+          background: 'rgba(37,99,235,0.08)',
           pointerEvents: 'none',
         }}
       />
@@ -240,7 +238,7 @@ function PremiumAiGlassLockCard({ fitScore, fitColor }: { fitScore: number; fitC
               width: 58,
               height: 58,
               borderRadius: 20,
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.34))',
+              background: 'rgba(255,255,255,0.86)',
               border: '1px solid rgba(255,255,255,0.78)',
               color: '#0F172A',
               display: 'flex',
@@ -480,7 +478,7 @@ export default async function EmployerApplicantDetailPage({
           {/* ── Hero ── */}
           <div
             style={{
-              background: 'linear-gradient(145deg, #0F172A, #1E293B)',
+              background: '#172033',
               borderRadius: 24,
               padding: '28px 32px',
               marginBottom: 20,
@@ -495,7 +493,7 @@ export default async function EmployerApplicantDetailPage({
                 right: -50,
                 width: 200,
                 height: 200,
-                background: 'radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%)',
+                background: 'rgba(37,99,235,0.14)',
                 borderRadius: '50%',
                 pointerEvents: 'none',
               }}
@@ -508,7 +506,7 @@ export default async function EmployerApplicantDetailPage({
                   width: 72,
                   height: 72,
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #2563EB, #7C3AED)',
+                  background: '#2563EB',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -772,7 +770,7 @@ export default async function EmployerApplicantDetailPage({
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 7,
-                    background: 'linear-gradient(135deg, #7C3AED, #6D28D9)',
+                    background: '#7C3AED',
                     color: '#fff',
                     padding: '10px 18px',
                     borderRadius: 12,

@@ -78,7 +78,7 @@ export default function MentorCard({ mentor, onRequestSession }: Props) {
               width: 64,
               height: 64,
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #3B82F6, #06B6D4)',
+              background: '#2563EB',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
@@ -291,9 +291,7 @@ export default function MentorCard({ mentor, onRequestSession }: Props) {
             flex: 1,
             padding: '10px 16px',
             borderRadius: 10,
-            background: mentor.isAvailable
-              ? 'linear-gradient(135deg, #2563EB, #1D4ED8)'
-              : '#E2E8F0',
+            background: mentor.isAvailable ? '#2563EB' : '#E2E8F0',
             color: mentor.isAvailable ? '#FFFFFF' : '#94A3B8',
             fontWeight: 700,
             fontSize: 14,

@@ -197,13 +197,13 @@ export default async function StudentJobsPage() {
             >
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
-                  { label: 'Listings', value: totalJobs, color: '#0F172A' },
-                  { label: 'Applied', value: appliedCount, color: '#075985' },
-                  { label: 'Opp. Score', value: student.opportunityScore ?? 0, color: '#047857' },
+                  { label: 'Listings', value: totalJobs, color: '#FFFFFF' },
+                  { label: 'Applied', value: appliedCount, color: '#BAE6FD' },
+                  { label: 'Opp. Score', value: student.opportunityScore ?? 0, color: '#A7F3D0' },
                   {
                     label: 'Profile',
                     value: `${student.profileCompleteness ?? 0}%`,
-                    color: '#92400E',
+                    color: '#FDE68A',
                   },
                 ].map((s) => (
                   <div

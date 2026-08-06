@@ -494,10 +494,6 @@ export default async function EmployerDashboard() {
               }
             >
               <div style={{ display: 'grid', gap: 12 }}>
-                <Tag
-                  label={usage.isPremium ? 'Premium active' : 'Regular employer'}
-                  tone={usage.isPremium ? 'success' : 'warning'}
-                />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <Crown size={22} color={usage.isPremium ? '#F59E0B' : '#64748B'} />
                   <div>

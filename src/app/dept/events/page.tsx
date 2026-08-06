@@ -26,46 +26,7 @@ import {
 } from '@/components/dashboard/DashboardContent';
 import { CalendarDays, Users, Clock, FileText } from 'lucide-react';
 import CloseJobButton from '@/app/employer/jobs/CloseJobButton';
-
-const navItems = [
-  { label: 'Overview', href: '/dept/dashboard', icon: 'dashboard' as const },
-  {
-    label: 'Events',
-    icon: 'calendar' as const,
-    items: [
-      {
-        label: 'Post Event',
-        href: '/dept/events/new',
-        description: 'Publish a webinar or workshop for students.',
-        icon: 'calendar' as const,
-      },
-      {
-        label: 'My Events',
-        href: '/dept/events',
-        description: 'View and manage all your posted events.',
-        icon: 'file' as const,
-      },
-    ],
-  },
-  {
-    label: 'Analytics',
-    icon: 'insights' as const,
-    items: [
-      {
-        label: 'Benchmarks',
-        href: '/dept/dashboard#benchmarks',
-        description: 'Set cohort thresholds.',
-        icon: 'target' as const,
-      },
-      {
-        label: 'Report',
-        href: '/dept/report',
-        description: 'Export strategic readiness report.',
-        icon: 'file' as const,
-      },
-    ],
-  },
-];
+import PaginatedCollection from '@/components/ui/PaginatedCollection';
 
 const TYPE_COLORS: Record<string, { bg: string; color: string; border: string }> = {
   webinar: { bg: '#F0F9FF', color: '#0369A1', border: '#BAE6FD' },
@@ -261,7 +222,10 @@ export default async function DeptEventsPage() {
               />
             </Panel>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <PaginatedCollection
+              itemLabel="events"
+              style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+            >
               {events.map((event) => {
                 const typeStyle = TYPE_COLORS[event.type] ?? TYPE_COLORS['webinar'];
                 const deadline = event.applicationDeadline
@@ -543,7 +507,7 @@ export default async function DeptEventsPage() {
                   </div>
                 );
               })}
-            </div>
+            </PaginatedCollection>
           )}
         </DashboardSection>
       </DashboardPage>

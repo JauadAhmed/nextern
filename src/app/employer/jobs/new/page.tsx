@@ -345,9 +345,7 @@ function ModeCard({
         textAlign: 'left',
         borderRadius: 18,
         border: `1.5px solid ${active ? C.blueBorder : C.border}`,
-        background: active
-          ? 'linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%)'
-          : 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
+        background: active ? '#EFF6FF' : '#FFFFFF',
         padding: '18px 18px 16px',
         cursor: 'pointer',
         boxShadow: active ? '0 16px 28px rgba(37,99,235,0.12)' : '0 6px 14px rgba(15,23,42,0.04)',
@@ -368,7 +366,7 @@ function ModeCard({
             width: 42,
             height: 42,
             borderRadius: 14,
-            background: active ? 'linear-gradient(135deg, #2563EB, #0EA5E9)' : '#F1F5F9',
+            background: active ? '#2563EB' : '#F1F5F9',
             color: active ? '#fff' : '#475569',
             display: 'flex',
             alignItems: 'center',
@@ -715,7 +713,7 @@ export default function NewJobPage() {
         {/* Header */}
         <div
           style={{
-            background: `linear-gradient(145deg, ${C.dark}, ${C.indigo})`,
+            background: C.dark,
             padding: '24px 0 0',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
           }}
@@ -1153,7 +1151,7 @@ export default function NewJobPage() {
                       style={{
                         borderRadius: 20,
                         border: `1px solid ${C.blueBorder}`,
-                        background: 'linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 100%)',
+                        background: '#EFF6FF',
                         padding: 22,
                         display: 'flex',
                         flexDirection: 'column',
@@ -1806,9 +1804,7 @@ export default function NewJobPage() {
                   style={{
                     borderRadius: 18,
                     border: `1px solid ${form.isBatchHiring ? C.blueBorder : C.border}`,
-                    background: form.isBatchHiring
-                      ? 'linear-gradient(135deg, #0F172A 0%, #1D4ED8 100%)'
-                      : 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
+                    background: form.isBatchHiring ? '#172033' : '#FFFFFF',
                     padding: '20px 22px',
                     marginBottom: 22,
                   }}
@@ -2078,7 +2074,7 @@ export default function NewJobPage() {
                       alignItems: 'center',
                       gap: 7,
                       padding: '10px 24px',
-                      background: `linear-gradient(135deg, ${C.blue}, #1D4ED8)`,
+                      background: C.blue,
                       color: C.white,
                       border: 'none',
                       borderRadius: 10,
@@ -2117,9 +2113,7 @@ export default function NewJobPage() {
                         alignItems: 'center',
                         gap: 7,
                         padding: '10px 28px',
-                        background: loading
-                          ? '#93C5FD'
-                          : `linear-gradient(135deg, ${C.blue}, #1D4ED8)`,
+                        background: loading ? '#93C5FD' : C.blue,
                         color: C.white,
                         border: 'none',
                         borderRadius: 10,

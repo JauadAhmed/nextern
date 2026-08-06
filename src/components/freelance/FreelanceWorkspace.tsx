@@ -37,6 +37,7 @@ import {
   FREELANCE_OPPORTUNITY_SCORE_DELTA,
 } from '@/lib/freelance-shared';
 import { PaymentMethodLogo } from '@/components/payments/PaymentMethodLogo';
+import PaginationControls from '@/components/ui/PaginationControls';
 import FreelanceStripeCheckoutModal from './FreelanceStripeCheckoutModal';
 
 type WorkspaceRole = 'student' | 'employer';
@@ -709,6 +710,9 @@ export default function FreelanceWorkspace({ role }: { role: WorkspaceRole }) {
 
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(currentView);
   const [listings, setListings] = useState<Listing[]>([]);
+  const [listingPage, setListingPage] = useState(1);
+  const [listingPageSize, setListingPageSize] = useState(24);
+  const [listingTotal, setListingTotal] = useState(0);
   const [serviceListings, setServiceListings] = useState<Listing[]>([]);
   const [clientOrders, setClientOrders] = useState<OrderSummary[]>([]);
   const [freelancerOrders, setFreelancerOrders] = useState<OrderSummary[]>([]);
@@ -851,41 +855,50 @@ export default function FreelanceWorkspace({ role }: { role: WorkspaceRole }) {
     [role, router, searchParams]
   );
 
-  const loadListings = useCallback(async () => {
-    setBoardLoading(true);
-    try {
-      const params = new URLSearchParams({ limit: '18' });
-      if (filters.search.trim()) params.set('search', filters.search.trim());
-      if (filters.category) params.set('category', filters.category);
-      if (filters.skill.trim()) params.set('skill', filters.skill.trim());
-      if (filters.minBudget.trim()) params.set('minBudget', filters.minBudget.trim());
-      if (filters.maxBudget.trim()) params.set('maxBudget', filters.maxBudget.trim());
+  const loadListings = useCallback(
+    async (nextPage = listingPage, nextPageSize = listingPageSize) => {
+      setBoardLoading(true);
+      try {
+        const params = new URLSearchParams({
+          page: String(nextPage),
+          limit: String(nextPageSize),
+        });
+        if (filters.search.trim()) params.set('search', filters.search.trim());
+        if (filters.category) params.set('category', filters.category);
+        if (filters.skill.trim()) params.set('skill', filters.skill.trim());
+        if (filters.minBudget.trim()) params.set('minBudget', filters.minBudget.trim());
+        if (filters.maxBudget.trim()) params.set('maxBudget', filters.maxBudget.trim());
 
-      const boardRequest = requestJson<{ listings: Listing[] }>(
-        `/api/freelance/listings?${params.toString()}`
-      );
+        const boardRequest = requestJson<{
+          listings: Listing[];
+          pagination?: { total?: number };
+        }>(`/api/freelance/listings?${params.toString()}`);
 
-      if (role === 'student') {
-        const mineRequest = requestJson<{ listings: Listing[] }>(
-          '/api/freelance/listings?mine=true'
-        );
-        const [boardData, mineData] = await Promise.all([boardRequest, mineRequest]);
-        setListings(boardData.listings ?? []);
-        setServiceListings(mineData.listings ?? []);
-      } else {
-        const data = await boardRequest;
-        setListings(data.listings ?? []);
-        setServiceListings([]);
+        if (role === 'student') {
+          const mineRequest = requestJson<{ listings: Listing[] }>(
+            '/api/freelance/listings?mine=true'
+          );
+          const [boardData, mineData] = await Promise.all([boardRequest, mineRequest]);
+          setListings(boardData.listings ?? []);
+          setListingTotal(boardData.pagination?.total ?? boardData.listings?.length ?? 0);
+          setServiceListings(mineData.listings ?? []);
+        } else {
+          const data = await boardRequest;
+          setListings(data.listings ?? []);
+          setListingTotal(data.pagination?.total ?? data.listings?.length ?? 0);
+          setServiceListings([]);
+        }
+      } catch (error) {
+        setFlash({
+          tone: 'error',
+          text: error instanceof Error ? error.message : 'Failed to load the freelance board.',
+        });
+      } finally {
+        setBoardLoading(false);
       }
-    } catch (error) {
-      setFlash({
-        tone: 'error',
-        text: error instanceof Error ? error.message : 'Failed to load the freelance board.',
-      });
-    } finally {
-      setBoardLoading(false);
-    }
-  }, [filters, requestJson, role]);
+    },
+    [filters, listingPage, listingPageSize, requestJson, role]
+  );
 
   const loadFinance = useCallback(async () => {
     setFinanceLoading(true);
@@ -1902,7 +1915,14 @@ export default function FreelanceWorkspace({ role }: { role: WorkspaceRole }) {
                 inputMode="numeric"
                 style={{ ...fieldInputStyle, flex: 1 }}
               />
-              <button type="button" onClick={() => void loadListings()} style={primaryButtonStyle}>
+              <button
+                type="button"
+                onClick={() => {
+                  setListingPage(1);
+                  void loadListings(1, listingPageSize);
+                }}
+                style={primaryButtonStyle}
+              >
                 <Filter size={14} />
                 Apply
               </button>
@@ -1928,6 +1948,7 @@ export default function FreelanceWorkspace({ role }: { role: WorkspaceRole }) {
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                gridAutoRows: '1fr',
                 gap: 16,
               }}
               className="freelance-card-grid"
@@ -1941,6 +1962,9 @@ export default function FreelanceWorkspace({ role }: { role: WorkspaceRole }) {
                     border: `1px solid ${listing.isActive ? C.border : C.dangerBorder}`,
                     padding: 20,
                     boxShadow: '0 12px 28px rgba(15,23,42,0.05)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
                   }}
                 >
                   <div
@@ -2000,6 +2024,12 @@ export default function FreelanceWorkspace({ role }: { role: WorkspaceRole }) {
                           fontWeight: 800,
                           color: C.text,
                           fontFamily: 'var(--font-display)',
+                          minHeight: 45,
+                          lineHeight: 1.25,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
                         }}
                       >
                         {listing.title}
@@ -2191,7 +2221,15 @@ export default function FreelanceWorkspace({ role }: { role: WorkspaceRole }) {
                     </div>
                   ) : null}
 
-                  <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 10,
+                      marginTop: 'auto',
+                      paddingTop: 16,
+                      flexWrap: 'wrap',
+                    }}
+                  >
                     {listing.canOrder ? (
                       <button
                         type="button"
@@ -2239,6 +2277,23 @@ export default function FreelanceWorkspace({ role }: { role: WorkspaceRole }) {
               description="Try widening the budget range, removing a skill filter, or publishing the first student service in this category."
             />
           )}
+          {!boardLoading && listingTotal > 0 ? (
+            <PaginationControls
+              page={listingPage}
+              pageSize={listingPageSize}
+              totalItems={listingTotal}
+              itemLabel="freelance services"
+              onPageChange={(nextPage) => {
+                setListingPage(nextPage);
+                void loadListings(nextPage, listingPageSize);
+              }}
+              onPageSizeChange={(nextPageSize) => {
+                setListingPageSize(nextPageSize);
+                setListingPage(1);
+                void loadListings(1, nextPageSize);
+              }}
+            />
+          ) : null}
         </SectionCard>
       ) : null}
       {activeTab === 'services' && role === 'student' ? (

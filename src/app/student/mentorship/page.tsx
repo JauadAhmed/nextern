@@ -7,6 +7,7 @@ import { Users, CalendarDays } from 'lucide-react';
 import MentorCard from '@/components/mentorship/MentorCard';
 import MentorFilterSidebar from '@/components/mentorship/MentorFilterSidebar';
 import RequestSessionModal from '@/components/mentorship/RequestSessionModal';
+import PaginatedCollection from '@/components/ui/PaginatedCollection';
 import { readJsonSafely } from '@/lib/safe-json';
 
 export default function BrowseMentorsPage() {
@@ -116,15 +117,15 @@ export default function BrowseMentorsPage() {
               Loading mentors...
             </div>
           ) : mentors.length > 0 ? (
-            <div
+            <PaginatedCollection
+              itemLabel="mentors"
+              resetKey={`${filters.industry}|${filters.expertise}|${filters.mentorType}`}
               className="mobile-page-grid-mentor mobile-page-list-scroll"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+                gridAutoRows: '1fr',
                 gap: 24,
-                maxHeight: 'calc(100vh - 250px)',
-                overflowY: 'auto',
-                paddingRight: '8px',
               }}
             >
               {mentors.map((mentor) => (
@@ -134,7 +135,7 @@ export default function BrowseMentorsPage() {
                   onRequestSession={handleRequestSession}
                 />
               ))}
-            </div>
+            </PaginatedCollection>
           ) : (
             <div
               style={{

@@ -151,7 +151,7 @@ function BrandStat({ value, label }: { value: string; label: string }) {
       >
         {value}
       </div>
-      <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: 12, color: '#B8C5D6', marginTop: 4, fontWeight: 500 }}>{label}</div>
     </div>
   );
 }
@@ -290,7 +290,7 @@ export default function LoginPage() {
         style={{
           width: '45%',
           minHeight: '100vh',
-          background: 'linear-gradient(145deg, #0F172A 0%, #1E293B 50%, #0F2347 100%)',
+          background: '#172033',
           padding: '48px 52px',
           display: 'flex',
           flexDirection: 'column',
@@ -308,7 +308,7 @@ export default function LoginPage() {
             right: -80,
             width: 320,
             height: 320,
-            background: 'radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%)',
+            background: 'rgba(37,99,235,0.14)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -320,7 +320,7 @@ export default function LoginPage() {
             left: -40,
             width: 260,
             height: 260,
-            background: 'radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%)',
+            background: 'rgba(8,145,178,0.08)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -332,7 +332,7 @@ export default function LoginPage() {
             left: '10%',
             width: 180,
             height: 180,
-            background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)',
+            background: 'rgba(124,58,237,0.06)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -415,7 +415,7 @@ export default function LoginPage() {
               <br />
               <span
                 style={{
-                  background: 'linear-gradient(120deg, #3B82F6, #22D3EE)',
+                  background: '#38BDF8',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -424,7 +424,7 @@ export default function LoginPage() {
                 starts here
               </span>
             </h2>
-            <p style={{ color: '#64748B', fontSize: 15, lineHeight: 1.75 }}>
+            <p style={{ color: '#B8C5D6', fontSize: 15, lineHeight: 1.75 }}>
               Sign in to access your dashboard, track your internship progress, and land your dream
               opportunity.
             </p>
@@ -508,7 +508,7 @@ export default function LoginPage() {
               </div>
               <div>
                 <div style={{ color: '#E2E8F0', fontSize: 13, fontWeight: 700 }}>Samia Rahman</div>
-                <div style={{ color: '#475569', fontSize: 12 }}>CS Student · BRAC University</div>
+                <div style={{ color: '#B8C5D6', fontSize: 12 }}>CS Student · BRAC University</div>
               </div>
             </div>
           </div>
@@ -801,7 +801,7 @@ export default function LoginPage() {
               style={{
                 width: '100%',
                 padding: '13px',
-                background: loading ? '#93C5FD' : 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                background: loading ? '#93C5FD' : '#2563EB',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 10,

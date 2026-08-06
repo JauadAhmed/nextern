@@ -198,10 +198,10 @@ export default async function EmployerAssessmentsPage({
             >
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {[
-                  { label: 'Assessments', value: data.stats.totalAssessments, color: '#0F172A' },
-                  { label: 'Live', value: data.stats.activeAssessments, color: '#075985' },
-                  { label: 'Assigned', value: data.stats.assignedCandidates, color: '#92400E' },
-                  { label: 'Graded', value: data.stats.gradedSubmissions, color: '#047857' },
+                  { label: 'Assessments', value: data.stats.totalAssessments, color: '#FFFFFF' },
+                  { label: 'Live', value: data.stats.activeAssessments, color: '#BAE6FD' },
+                  { label: 'Assigned', value: data.stats.assignedCandidates, color: '#FDE68A' },
+                  { label: 'Graded', value: data.stats.gradedSubmissions, color: '#A7F3D0' },
                 ].map((stat) => (
                   <div
                     key={stat.label}

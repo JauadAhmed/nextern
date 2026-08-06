@@ -417,9 +417,12 @@ export default function DashboardShell({
     return (
       <>
         <button
+          type="button"
           onClick={() =>
             setDesktopDropdown((current) => (current === item.label ? null : item.label))
           }
+          aria-expanded={desktopDropdown === item.label}
+          aria-haspopup="menu"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -613,8 +616,7 @@ export default function DashboardShell({
         <div className="dashboard-shell-desktop">
           <div
             style={{
-              background:
-                'linear-gradient(135deg, rgba(30,41,59,1), rgba(30,41,59,0.98) 55%, rgba(37,99,235,0.96))',
+              background: '#172033',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}
           >
@@ -677,24 +679,6 @@ export default function DashboardShell({
                     {user.subtitle}
                   </span>
                 </div>
-
-                {premiumActive && (
-                  <div
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      padding: '8px 12px',
-                      borderRadius: 999,
-                      background: 'rgba(245,158,11,0.14)',
-                      border: '1px solid rgba(245,158,11,0.3)',
-                      color: '#FDE68A',
-                    }}
-                  >
-                    <Crown size={14} />
-                    <span style={{ fontSize: 12, fontWeight: 800 }}>Premium active</span>
-                  </div>
-                )}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -728,7 +712,11 @@ export default function DashboardShell({
 
                 <div style={{ position: 'relative' }}>
                   <button
+                    type="button"
                     onClick={() => setUserMenuOpen((current) => !current)}
+                    aria-expanded={userMenuOpen}
+                    aria-haspopup="menu"
+                    aria-controls="dashboard-account-menu"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -753,7 +741,7 @@ export default function DashboardShell({
                           width: 36,
                           height: 36,
                           borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #2563EB, #22D3EE)',
+                          background: '#2563EB',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -811,6 +799,8 @@ export default function DashboardShell({
 
                   {userMenuOpen && (
                     <div
+                      id="dashboard-account-menu"
+                      role="menu"
                       style={{
                         position: 'absolute',
                         right: 0,
@@ -837,24 +827,6 @@ export default function DashboardShell({
                         <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>
                           {user.email}
                         </div>
-                        {premiumActive && (
-                          <div
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 6,
-                              marginTop: 10,
-                              padding: '4px 10px',
-                              borderRadius: 999,
-                              background: '#FEF3C7',
-                              color: '#92400E',
-                              fontSize: 11,
-                              fontWeight: 800,
-                            }}
-                          >
-                            <Crown size={12} /> Premium active
-                          </div>
-                        )}
                       </div>
 
                       {profileMenuItems.map((item) => (
@@ -961,6 +933,8 @@ export default function DashboardShell({
               className="dashboard-shell-mobile-icon-button"
               onClick={() => setMobileNavOpen(true)}
               aria-label="Open navigation"
+              aria-expanded={mobileNavOpen}
+              aria-controls="dashboard-mobile-navigation"
             >
               <Menu size={18} />
             </button>
@@ -1020,7 +994,11 @@ export default function DashboardShell({
         aria-label="Close navigation"
       />
 
-      <aside className={`dashboard-shell-mobile-drawer ${mobileNavOpen ? 'is-open' : ''}`}>
+      <aside
+        id="dashboard-mobile-navigation"
+        aria-hidden={!mobileNavOpen}
+        className={`dashboard-shell-mobile-drawer ${mobileNavOpen ? 'is-open' : ''}`}
+      >
         <div className="dashboard-shell-mobile-drawer-header">
           <NexternLogo
             markSize={34}
@@ -1172,8 +1150,7 @@ export default function DashboardShell({
           display: none;
         }
         .dashboard-shell-mobile-bar {
-          background:
-            linear-gradient(135deg, rgba(30,41,59,1), rgba(30,41,59,0.98) 55%, rgba(37,99,235,0.96));
+          background: #172033;
           border-bottom: 1px solid rgba(255,255,255,0.08);
           padding: 12px 16px;
           display: flex;
@@ -1225,7 +1202,7 @@ export default function DashboardShell({
           position: fixed;
           inset: 0 auto 0 0;
           width: min(360px, 92vw);
-          background: linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 100%);
+          background: #F8FAFC;
           box-shadow: 0 24px 60px rgba(15,23,42,0.24);
           padding: 16px;
           display: flex;
@@ -1254,9 +1231,8 @@ export default function DashboardShell({
           display: grid;
           gap: 12px;
           padding: 16px;
-          border-radius: 24px;
-          background:
-            linear-gradient(145deg, rgba(30,41,59,1), rgba(30,41,59,0.98) 55%, rgba(37,99,235,0.96));
+          border-radius: 20px;
+          background: #23324A;
           color: #E2E8F0;
           border: 1px solid rgba(255,255,255,0.08);
           box-shadow: 0 18px 32px rgba(15,23,42,0.16);
@@ -1271,7 +1247,7 @@ export default function DashboardShell({
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #2563EB, #22D3EE);
+          background: #2563EB;
           display: flex;
           align-items: center;
           justify-content: center;

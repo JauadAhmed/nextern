@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import PaginatedCollection from '@/components/ui/PaginatedCollection';
 import {
   BriefcaseBusiness,
   CalendarDays,
@@ -16,9 +17,6 @@ import {
   BadgeCheck,
   XCircle,
   Undo2,
-  MapPin,
-  Clock,
-  ChevronRight,
   MessageCircle,
   X,
   ShieldAlert,
@@ -93,12 +91,6 @@ function formatStatusLabel(v: string) {
     .split('_')
     .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
     .join(' ');
-}
-
-function getFitColor(score: number) {
-  if (score >= 70) return { bg: '#ECFDF5', color: '#065F46', border: '#A7F3D0' };
-  if (score >= 40) return { bg: '#EFF6FF', color: '#2563EB', border: '#BFDBFE' };
-  return { bg: '#FFFBEB', color: '#92400E', border: '#FDE68A' };
 }
 
 /* ─── Inline responsive styles injected once ─────────────────────────────────── */
@@ -721,7 +713,11 @@ export default function ApplicationsTabs({
               </Link>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <PaginatedCollection
+              itemLabel={isEvent ? 'event registrations' : 'applications'}
+              resetKey={activeTab}
+              style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+            >
               {activeItems.map((app) => (
                 <AppCard
                   key={app._id}
@@ -730,7 +726,7 @@ export default function ApplicationsTabs({
                   onShowWarning={() => setShowWarning(true)}
                 />
               ))}
-            </div>
+            </PaginatedCollection>
           )}
         </div>
       </div>

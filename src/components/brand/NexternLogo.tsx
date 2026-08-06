@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import type { CSSProperties, ReactNode } from 'react';
 
-const LOGO_SRC = '/nextern_logo.jpg';
-const LOGO_IMAGE_SIZE = 642;
+const LOGO_SRC = '/nextern_logo_2.png';
+const LOGO_IMAGE_SIZE = 2000;
 
 type NexternLogoMarkProps = {
   alt?: string;
@@ -25,7 +25,7 @@ export function NexternLogoMark({
     <span
       style={{
         alignItems: 'center',
-        background: '#FFFFFF',
+        background: '#172033',
         borderRadius: radius,
         boxShadow: shadow,
         display: 'inline-flex',
@@ -47,7 +47,8 @@ export function NexternLogoMark({
         style={{
           display: 'block',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: 'contain',
+          transform: 'scale(1.42)',
           width: '100%',
         }}
       />
