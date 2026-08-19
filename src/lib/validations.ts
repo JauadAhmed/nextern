@@ -313,20 +313,67 @@ export const AdminSubscriptionUpdateSchema = z
     message: 'At least one field must be provided.',
   });
 
-export const AdminSupportNotificationSchema = z.object({
-  userId: z.string().length(24, 'Invalid user ID'),
-  type: z.enum([
-    'status_update',
-    'message_received',
-    'advisor_note',
-    'payment_received',
-    'job_match',
-    'badge_earned',
-  ]),
-  title: z.string().min(3).max(120),
-  body: z.string().min(5).max(1000),
-  link: z.string().max(200).optional().or(z.literal('')),
-});
+export const AdminSupportNotificationSchema = z
+  .object({
+    userId: z
+      .string()
+      .trim()
+      .regex(/^[0-9a-fA-F]{24}$/, 'Invalid user ID'),
+    sendType: z
+      .enum(['notification', 'support_message', 'both'])
+      .optional()
+      .default('notification'),
+    type: z
+      .enum([
+        'status_update',
+        'message_received',
+        'advisor_note',
+        'payment_received',
+        'job_match',
+        'badge_earned',
+        'support_message',
+        'admin_message',
+        'system_message',
+      ])
+      .optional(),
+    title: z.string().trim().max(120).optional().default(''),
+    body: z.string().trim().max(1000).optional().default(''),
+    link: z.string().trim().max(200).optional().or(z.literal('')),
+    supportMessage: z.string().trim().max(5000).optional().default(''),
+    messageType: z
+      .enum(['support_message', 'admin_message', 'system_message'])
+      .optional()
+      .default('support_message'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.sendType === 'notification' || data.sendType === 'both') {
+      if (!data.type) {
+        ctx.addIssue({ code: 'custom', path: ['type'], message: 'Notification type is required' });
+      }
+      if (data.title.length < 3) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['title'],
+          message: 'Notification title must be at least 3 characters',
+        });
+      }
+      if (data.body.length < 5) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['body'],
+          message: 'Notification message must be at least 5 characters',
+        });
+      }
+    }
+
+    if ((data.sendType === 'support_message' || data.sendType === 'both') && !data.supportMessage) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['supportMessage'],
+        message: 'Support message is required',
+      });
+    }
+  });
 
 export const AdminMessageModerationSchema = z.object({
   isFlagged: z.boolean(),

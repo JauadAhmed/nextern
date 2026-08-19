@@ -1,4 +1,5 @@
 import type { SortOrder } from 'mongoose';
+import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { User } from '@/models/User';
@@ -59,7 +60,11 @@ export async function GET(req: NextRequest) {
     if (university) query.university = buildSearchRegex(university);
     if (department) query.department = buildSearchRegex(department);
     if (searchRegex) {
+      const search = searchParams.get('search')?.trim() ?? '';
       query.$or = [
+        ...(mongoose.Types.ObjectId.isValid(search)
+          ? [{ _id: new mongoose.Types.ObjectId(search) }]
+          : []),
         { name: searchRegex },
         { email: searchRegex },
         { phone: searchRegex },

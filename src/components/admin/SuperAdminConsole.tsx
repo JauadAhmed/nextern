@@ -9,22 +9,27 @@ import {
   Activity,
   BadgeDollarSign,
   BellRing,
+  Building2,
   BriefcaseBusiness,
   ChartColumn,
+  Check,
   CheckCheck,
   CircleAlert,
   Crown,
   LifeBuoy,
   LoaderCircle,
+  Mail,
   MessageSquareWarning,
   PencilLine,
   RefreshCw,
   Save,
   Search,
+  Send,
   ShieldCheck,
   Trash2,
   UserCog,
   Users,
+  UserRound,
   X,
 } from 'lucide-react';
 import {
@@ -58,6 +63,21 @@ type SectionKey =
   | 'analytics';
 
 type NoticeState = { tone: 'success' | 'error'; text: string } | null;
+
+type SupportSendType = 'notification' | 'support_message' | 'both';
+type SupportMessageType = 'support_message' | 'admin_message' | 'system_message';
+
+type SupportUser = {
+  _id: string;
+  name?: string;
+  email?: string;
+  university?: string;
+  institutionName?: string;
+  companyName?: string;
+  studentId?: string;
+  advisorStaffId?: string;
+  role?: string;
+};
 
 type CurrentUser = {
   name: string;
@@ -132,6 +152,13 @@ const SECTION_META: Record<
 
 const PIE_COLORS = ['#0f766e', '#1d4ed8', '#c2410c', '#7c3aed', '#166534', '#be123c'];
 
+const NAV_GROUPS: Array<{ label: string; items: SectionKey[] }> = [
+  { label: 'Workspace', items: ['overview', 'verification', 'users'] },
+  { label: 'Operations', items: ['jobs', 'applications', 'finance', 'freelance'] },
+  { label: 'Communication', items: ['support', 'messages'] },
+  { label: 'Insights', items: ['analytics'] },
+];
+
 function formatMoney(value: number) {
   return new Intl.NumberFormat('en-BD', {
     style: 'currency',
@@ -170,6 +197,12 @@ function roleLabel(role?: string) {
   if (!role) return 'Unknown';
   if (role === 'dept_head') return 'Department head';
   return role.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function messageTypeLabel(type?: string) {
+  if (type === 'admin_message') return 'Admin Message';
+  if (type === 'system_message') return 'System Message';
+  return 'Support Message';
 }
 
 function statusTone(status?: string) {
@@ -282,6 +315,39 @@ function SectionEmpty({ title, description }: { title: string; description: stri
   );
 }
 
+function SupportUserDetails({ user }: { user: SupportUser }) {
+  const organization = user.university || user.institutionName || user.companyName;
+  const institutionalId = user.studentId || user.advisorStaffId;
+
+  return (
+    <div className={styles.supportUserDetails}>
+      <div className={styles.supportUserName}>
+        {user.name || user.companyName || 'Unnamed user'}
+      </div>
+      <div className={styles.supportUserEmail}>
+        <Mail size={14} />
+        <span>{user.email || 'No email available'}</span>
+      </div>
+      <div className={styles.supportUserMeta}>
+        {organization ? (
+          <span>
+            <Building2 size={14} /> {organization}
+          </span>
+        ) : null}
+        {institutionalId ? (
+          <span>
+            <UserRound size={14} /> ID: {institutionalId}
+          </span>
+        ) : null}
+        <span>Role: {roleLabel(user.role)}</span>
+        <span>
+          <span aria-hidden="true">#</span> {user._id}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function SuperAdminConsole({ currentUser }: { currentUser: CurrentUser }) {
   const [activeSection, setActiveSection] = useState<SectionKey>('overview');
   const [notice, setNotice] = useState<NoticeState>(null);
@@ -363,16 +429,29 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportComposer, setSupportComposer] = useState({
     userId: '',
+    sendType: 'notification' as SupportSendType,
     type: 'status_update',
     title: '',
     body: '',
     link: '',
+    supportMessage: '',
+    messageType: 'support_message' as SupportMessageType,
   });
+  const [supportUserQuery, setSupportUserQuery] = useState('');
+  const [supportUserResults, setSupportUserResults] = useState<SupportUser[]>([]);
+  const [selectedSupportUser, setSelectedSupportUser] = useState<SupportUser | null>(null);
+  const [supportUserSearchState, setSupportUserSearchState] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
+  const [supportSearchOpen, setSupportSearchOpen] = useState(false);
+  const [supportFormErrors, setSupportFormErrors] = useState<Record<string, string>>({});
   const [messageReasonDrafts, setMessageReasonDrafts] = useState<Record<string, string>>({});
   const [supportActionId, setSupportActionId] = useState<string | null>(null);
 
   const [messagesFilters, setMessagesFilters] = useState({
     flaggedOnly: 'all',
+    unreadOnly: 'all',
+    type: 'all',
     search: '',
   });
   const [messagesData, setMessagesData] = useState<any>(null);
@@ -412,6 +491,40 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
     messagesData,
     overview,
   ]);
+
+  useEffect(() => {
+    const query = supportUserQuery.trim();
+    if (!query || selectedSupportUser) {
+      setSupportUserResults([]);
+      setSupportUserSearchState('idle');
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setSupportUserSearchState('loading');
+      try {
+        const params = new URLSearchParams({ search: query, page: '1', limit: '8' });
+        const data = await requestJson<{ users?: SupportUser[] }>(
+          `/api/admin/users?${params.toString()}`,
+          { signal: controller.signal }
+        );
+        setSupportUserResults(data.users ?? []);
+        setSupportUserSearchState('success');
+        setSupportSearchOpen(true);
+      } catch {
+        if (controller.signal.aborted) return;
+        setSupportUserResults([]);
+        setSupportUserSearchState('error');
+        setSupportSearchOpen(true);
+      }
+    }, 350);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [supportUserQuery, selectedSupportUser]);
 
   useEffect(() => {
     if (!selectedUser) {
@@ -683,6 +796,9 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
       const params = new URLSearchParams({ limit: '20' });
       if (messagesFilters.flaggedOnly !== 'all')
         params.set('flaggedOnly', messagesFilters.flaggedOnly);
+      if (messagesFilters.unreadOnly !== 'all')
+        params.set('unreadOnly', messagesFilters.unreadOnly);
+      if (messagesFilters.type !== 'all') params.set('type', messagesFilters.type);
       if (messagesFilters.search.trim()) params.set('search', messagesFilters.search.trim());
       setMessagesData(await requestJson(`/api/admin/messages?${params.toString()}`));
     } catch (error) {
@@ -1019,17 +1135,60 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
 
   async function handleSupportSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const errors: Record<string, string> = {};
+    const sendsNotification = supportComposer.sendType !== 'support_message';
+    const sendsMessage = supportComposer.sendType !== 'notification';
+
+    if (!selectedSupportUser || supportComposer.userId !== selectedSupportUser._id) {
+      errors.userId = 'Select a valid user from the search results.';
+    }
+    if (sendsNotification && supportComposer.title.trim().length < 3) {
+      errors.title = 'Enter a title with at least 3 characters.';
+    }
+    if (sendsNotification && supportComposer.body.trim().length < 5) {
+      errors.body = 'Enter notification content with at least 5 characters.';
+    }
+    if (sendsMessage && !supportComposer.supportMessage.trim()) {
+      errors.supportMessage = 'Write a support message before sending.';
+    }
+
+    setSupportFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
     setSupportActionId('send');
     try {
-      await requestJson('/api/admin/support', {
+      const response = await requestJson<{
+        message: string;
+        partial?: boolean;
+        results?: {
+          notification?: { success: boolean; error?: string };
+          supportMessage?: { success: boolean; error?: string };
+        };
+      }>('/api/admin/support', {
         method: 'POST',
-        body: JSON.stringify(supportComposer),
+        body: JSON.stringify({
+          ...supportComposer,
+          title: supportComposer.title.trim(),
+          body: supportComposer.body.trim(),
+          link: supportComposer.link.trim(),
+          supportMessage: supportComposer.supportMessage.trim(),
+        }),
       });
-      setSupportComposer({ userId: '', type: 'status_update', title: '', body: '', link: '' });
-      showNotice('success', 'Support notification sent.');
-      await Promise.all([loadSupport(), loadOverview()]);
+      setSupportComposer((current) => ({
+        ...current,
+        title: '',
+        body: '',
+        link: '',
+        supportMessage: '',
+      }));
+      setSupportFormErrors({});
+      showNotice(response.partial ? 'error' : 'success', response.message);
+      await Promise.all([loadSupport(), loadMessages(), loadOverview()]);
     } catch (error) {
-      showNotice('error', error instanceof Error ? error.message : 'Failed to send notification.');
+      showNotice(
+        'error',
+        error instanceof Error ? error.message : 'Failed to send support communication.'
+      );
     } finally {
       setSupportActionId(null);
     }
@@ -1095,13 +1254,35 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
     });
   }
 
-  function openSupportForUser(userId: string) {
+  async function openSupportForUser(userId: string) {
     setActiveSection('support');
-    setSupportComposer((current) => ({ ...current, userId }));
+    setSupportUserQuery(userId);
+    setSelectedSupportUser(null);
+    setSupportComposer((current) => ({ ...current, userId: '' }));
+    setSupportUserSearchState('loading');
+    try {
+      const params = new URLSearchParams({ search: userId, page: '1', limit: '1' });
+      const data = await requestJson<{ users?: SupportUser[] }>(
+        `/api/admin/users?${params.toString()}`
+      );
+      const user = data.users?.find((item) => item._id === userId) ?? null;
+      if (user) {
+        setSelectedSupportUser(user);
+        setSupportComposer((current) => ({ ...current, userId: user._id }));
+        setSupportUserSearchState('idle');
+        setSupportSearchOpen(false);
+      } else {
+        setSupportUserSearchState('success');
+        setSupportSearchOpen(true);
+      }
+    } catch {
+      setSupportUserSearchState('error');
+      setSupportSearchOpen(true);
+    }
     if (!supportData) void loadSupport();
   }
 
-  const navItems = (Object.keys(SECTION_META) as SectionKey[]).map((key) => {
+  function renderNavItem(key: SectionKey) {
     const item = SECTION_META[key];
     const Icon = item.icon;
     const badge =
@@ -1130,7 +1311,14 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
         {badge > 0 ? <span className={styles.navBadge}>{badge}</span> : null}
       </button>
     );
-  });
+  }
+
+  const navItems = NAV_GROUPS.map((group) => (
+    <div className={styles.navGroup} key={group.label}>
+      <div className={styles.navGroupLabel}>{group.label}</div>
+      <div className={styles.navGroupItems}>{group.items.map(renderNavItem)}</div>
+    </div>
+  ));
 
   return (
     <div className={styles.page}>
@@ -1144,9 +1332,11 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
             </div>
           </div>
           <p className={styles.sidebarCopy}>
-            Verification, accounts, finance, support, and analytics from one command surface.
+            Manage people, operations, and support from one secure workspace.
           </p>
-          <nav className={styles.nav}>{navItems}</nav>
+          <nav className={styles.nav} aria-label="Admin navigation">
+            {navItems}
+          </nav>
           <div className={styles.sidebarShortcutGroup}>
             <div className={styles.sidebarGroupLabel}>Academic tools</div>
             <Link href="/admin/dept-heads" className={styles.sidebarShortcutLink}>
@@ -3828,98 +4018,345 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                 <div className={styles.panel}>
                   <div className={styles.panelHeader}>
                     <div>
-                      <h2>Send support notification</h2>
-                      <p>Push an admin note to a specific user.</p>
+                      <h2>Send support communication</h2>
+                      <p>Find a recipient, choose a channel, and compose the update.</p>
                     </div>
                   </div>
-                  <form className={styles.formGrid} onSubmit={handleSupportSubmit}>
-                    <div className={styles.filterField}>
-                      <label>User ID</label>
-                      <input
-                        value={supportComposer.userId}
-                        onChange={(event) =>
-                          setSupportComposer((current) => ({
-                            ...current,
-                            userId: event.target.value,
-                          }))
-                        }
-                        placeholder="Paste user id"
-                        required
-                      />
-                    </div>
-                    <div className={styles.filterField}>
-                      <label>Type</label>
-                      <select
-                        value={supportComposer.type}
-                        onChange={(event) =>
-                          setSupportComposer((current) => ({
-                            ...current,
-                            type: event.target.value,
-                          }))
-                        }
-                      >
-                        <option value="status_update">Status update</option>
-                        <option value="message_received">Message received</option>
-                        <option value="advisor_note">Advisor note</option>
-                        <option value="payment_received">Payment received</option>
-                        <option value="job_match">Job match</option>
-                        <option value="badge_earned">Badge earned</option>
-                      </select>
-                    </div>
-                    <div className={styles.filterFieldWide}>
-                      <label>Title</label>
-                      <input
-                        value={supportComposer.title}
-                        onChange={(event) =>
-                          setSupportComposer((current) => ({
-                            ...current,
-                            title: event.target.value,
-                          }))
-                        }
-                        placeholder="Short title"
-                        required
-                      />
-                    </div>
-                    <div className={styles.filterFieldFull}>
-                      <label>Message</label>
-                      <textarea
-                        rows={4}
-                        value={supportComposer.body}
-                        onChange={(event) =>
-                          setSupportComposer((current) => ({
-                            ...current,
-                            body: event.target.value,
-                          }))
-                        }
-                        placeholder="Explain the support update"
-                        required
-                      />
-                    </div>
-                    <div className={styles.filterFieldFull}>
-                      <label>Link</label>
-                      <input
-                        value={supportComposer.link}
-                        onChange={(event) =>
-                          setSupportComposer((current) => ({
-                            ...current,
-                            link: event.target.value,
-                          }))
-                        }
-                        placeholder="/student/applications"
-                      />
-                    </div>
-                    <button
-                      className={styles.primaryButton}
-                      type="submit"
-                      disabled={supportActionId === 'send'}
-                    >
-                      {supportActionId === 'send' ? (
-                        <LoaderCircle className={styles.spin} size={14} />
+                  <form
+                    className={styles.supportComposer}
+                    onSubmit={handleSupportSubmit}
+                    noValidate
+                  >
+                    <div className={styles.composerSection}>
+                      <div className={styles.composerSectionHeader}>
+                        <span className={styles.composerStep}>1</span>
+                        <div>
+                          <h3>Recipient</h3>
+                          <p>Search by the account email address or internal user ID.</p>
+                        </div>
+                      </div>
+
+                      {selectedSupportUser ? (
+                        <div className={styles.selectedSupportUser}>
+                          <span className={styles.selectedUserCheck} aria-hidden="true">
+                            <Check size={17} />
+                          </span>
+                          <SupportUserDetails user={selectedSupportUser} />
+                          <button
+                            className={styles.secondaryButton}
+                            type="button"
+                            onClick={() => {
+                              setSelectedSupportUser(null);
+                              setSupportComposer((current) => ({ ...current, userId: '' }));
+                              setSupportUserQuery('');
+                              setSupportFormErrors((current) => ({ ...current, userId: '' }));
+                            }}
+                          >
+                            Change user
+                          </button>
+                        </div>
                       ) : (
-                        <BellRing size={14} />
+                        <div className={styles.userSearchWrap}>
+                          <label htmlFor="support-user-search">Search by User ID or Email</label>
+                          <div className={styles.searchInputWrap}>
+                            <Search size={17} aria-hidden="true" />
+                            <input
+                              id="support-user-search"
+                              role="combobox"
+                              aria-autocomplete="list"
+                              aria-controls="support-user-results"
+                              aria-expanded={supportSearchOpen}
+                              aria-invalid={Boolean(supportFormErrors.userId)}
+                              value={supportUserQuery}
+                              onFocus={() => {
+                                if (supportUserQuery.trim()) setSupportSearchOpen(true);
+                              }}
+                              onChange={(event) => {
+                                setSupportUserQuery(event.target.value);
+                                setSelectedSupportUser(null);
+                                setSupportComposer((current) => ({ ...current, userId: '' }));
+                                setSupportFormErrors((current) => ({ ...current, userId: '' }));
+                                setSupportSearchOpen(Boolean(event.target.value.trim()));
+                              }}
+                              placeholder="Search user by email or User ID"
+                              autoComplete="off"
+                            />
+                            {supportUserSearchState === 'loading' ? (
+                              <LoaderCircle
+                                className={styles.spin}
+                                size={17}
+                                aria-label="Searching"
+                              />
+                            ) : null}
+                          </div>
+                          {supportSearchOpen && supportUserQuery.trim() ? (
+                            <div
+                              className={styles.userSearchResults}
+                              id="support-user-results"
+                              role="listbox"
+                            >
+                              {supportUserSearchState === 'loading' ? (
+                                <div className={styles.searchState}>Searching users…</div>
+                              ) : supportUserSearchState === 'error' ? (
+                                <div className={`${styles.searchState} ${styles.searchStateError}`}>
+                                  User search failed. Try again.
+                                </div>
+                              ) : supportUserSearchState === 'success' &&
+                                supportUserResults.length === 0 ? (
+                                <div className={styles.searchState}>No user found.</div>
+                              ) : (
+                                supportUserResults.map((user) => (
+                                  <button
+                                    className={styles.userSearchResult}
+                                    key={user._id}
+                                    type="button"
+                                    role="option"
+                                    aria-selected="false"
+                                    onClick={() => {
+                                      setSelectedSupportUser(user);
+                                      setSupportComposer((current) => ({
+                                        ...current,
+                                        userId: user._id,
+                                      }));
+                                      setSupportFormErrors((current) => ({
+                                        ...current,
+                                        userId: '',
+                                      }));
+                                      setSupportSearchOpen(false);
+                                    }}
+                                  >
+                                    <SupportUserDetails user={user} />
+                                  </button>
+                                ))
+                              )}
+                            </div>
+                          ) : null}
+                          {supportFormErrors.userId ? (
+                            <div className={styles.fieldError}>{supportFormErrors.userId}</div>
+                          ) : null}
+                        </div>
                       )}
-                      Send notification
-                    </button>
+                    </div>
+
+                    <div className={styles.composerSection}>
+                      <div className={styles.composerSectionHeader}>
+                        <span className={styles.composerStep}>2</span>
+                        <div>
+                          <h3>Communication type</h3>
+                          <p>Choose where this communication should appear for the user.</p>
+                        </div>
+                      </div>
+                      <div className={styles.sendTypeOptions}>
+                        {(
+                          [
+                            ['notification', 'Notification', 'Send an in-app alert.'],
+                            [
+                              'support_message',
+                              messageTypeLabel(supportComposer.messageType),
+                              'Send a direct inbox message.',
+                            ],
+                            [
+                              'both',
+                              `Notification + ${messageTypeLabel(supportComposer.messageType)}`,
+                              'Deliver through both channels.',
+                            ],
+                          ] as const
+                        ).map(([value, label, description]) => (
+                          <label
+                            className={`${styles.sendTypeOption} ${
+                              supportComposer.sendType === value ? styles.sendTypeOptionActive : ''
+                            }`}
+                            key={value}
+                          >
+                            <input
+                              type="radio"
+                              name="support-send-type"
+                              value={value}
+                              checked={supportComposer.sendType === value}
+                              onChange={() =>
+                                setSupportComposer((current) => ({
+                                  ...current,
+                                  sendType: value,
+                                }))
+                              }
+                            />
+                            <span>
+                              <strong>{label}</strong>
+                              <small>{description}</small>
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {supportComposer.sendType !== 'support_message' ? (
+                      <div className={styles.composerSection}>
+                        <div className={styles.composerSectionHeader}>
+                          <span className={styles.composerStep}>3</span>
+                          <div>
+                            <h3>Notification</h3>
+                            <p>Configure the existing in-app notification.</p>
+                          </div>
+                        </div>
+                        <div className={styles.formGrid}>
+                          <div className={styles.filterField}>
+                            <label htmlFor="support-notification-type">Type</label>
+                            <select
+                              id="support-notification-type"
+                              value={supportComposer.type}
+                              onChange={(event) =>
+                                setSupportComposer((current) => ({
+                                  ...current,
+                                  type: event.target.value,
+                                }))
+                              }
+                            >
+                              <option value="status_update">Status update</option>
+                              <option value="message_received">Message received</option>
+                              <option value="advisor_note">Advisor note</option>
+                              <option value="payment_received">Payment received</option>
+                              <option value="job_match">Job match</option>
+                              <option value="badge_earned">Badge earned</option>
+                              <option value="support_message">Support message</option>
+                              <option value="admin_message">Admin message</option>
+                              <option value="system_message">System message</option>
+                            </select>
+                          </div>
+                          <div className={styles.filterFieldWide}>
+                            <label htmlFor="support-notification-title">Title</label>
+                            <input
+                              id="support-notification-title"
+                              value={supportComposer.title}
+                              aria-invalid={Boolean(supportFormErrors.title)}
+                              onChange={(event) => {
+                                setSupportComposer((current) => ({
+                                  ...current,
+                                  title: event.target.value,
+                                }));
+                                setSupportFormErrors((current) => ({ ...current, title: '' }));
+                              }}
+                              placeholder="Short, clear notification title"
+                            />
+                            {supportFormErrors.title ? (
+                              <div className={styles.fieldError}>{supportFormErrors.title}</div>
+                            ) : null}
+                          </div>
+                          <div className={styles.filterFieldFull}>
+                            <label htmlFor="support-notification-body">Notification content</label>
+                            <textarea
+                              id="support-notification-body"
+                              rows={4}
+                              value={supportComposer.body}
+                              aria-invalid={Boolean(supportFormErrors.body)}
+                              onChange={(event) => {
+                                setSupportComposer((current) => ({
+                                  ...current,
+                                  body: event.target.value,
+                                }));
+                                setSupportFormErrors((current) => ({ ...current, body: '' }));
+                              }}
+                              placeholder="Explain the support update"
+                            />
+                            {supportFormErrors.body ? (
+                              <div className={styles.fieldError}>{supportFormErrors.body}</div>
+                            ) : null}
+                          </div>
+                          <div className={styles.filterFieldFull}>
+                            <label htmlFor="support-notification-link">Link (optional)</label>
+                            <input
+                              id="support-notification-link"
+                              value={supportComposer.link}
+                              onChange={(event) =>
+                                setSupportComposer((current) => ({
+                                  ...current,
+                                  link: event.target.value,
+                                }))
+                              }
+                              placeholder="/student/applications"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {supportComposer.sendType !== 'notification' ? (
+                      <div className={styles.composerSection}>
+                        <div className={styles.composerSectionHeader}>
+                          <span className={styles.composerStep}>
+                            {supportComposer.sendType === 'support_message' ? '3' : '4'}
+                          </span>
+                          <div>
+                            <h3>{messageTypeLabel(supportComposer.messageType)}</h3>
+                            <p>This will appear in the user’s existing Messages inbox.</p>
+                          </div>
+                        </div>
+                        <div className={styles.filterFieldFull}>
+                          <label htmlFor="support-message-type">Message label</label>
+                          <select
+                            id="support-message-type"
+                            value={supportComposer.messageType}
+                            onChange={(event) =>
+                              setSupportComposer((current) => ({
+                                ...current,
+                                messageType: event.target.value as SupportMessageType,
+                              }))
+                            }
+                          >
+                            <option value="support_message">Support Message</option>
+                            <option value="admin_message">Admin Message</option>
+                            <option value="system_message">System Message</option>
+                          </select>
+                          <div className={styles.fieldHint}>
+                            Choose how this message is identified to the recipient.
+                          </div>
+                        </div>
+                        <div className={styles.filterFieldFull}>
+                          <label htmlFor="support-direct-message">Message</label>
+                          <textarea
+                            id="support-direct-message"
+                            rows={6}
+                            value={supportComposer.supportMessage}
+                            aria-invalid={Boolean(supportFormErrors.supportMessage)}
+                            onChange={(event) => {
+                              setSupportComposer((current) => ({
+                                ...current,
+                                supportMessage: event.target.value,
+                              }));
+                              setSupportFormErrors((current) => ({
+                                ...current,
+                                supportMessage: '',
+                              }));
+                            }}
+                            placeholder="Write your support message…"
+                          />
+                          {supportFormErrors.supportMessage ? (
+                            <div className={styles.fieldError}>
+                              {supportFormErrors.supportMessage}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <div className={styles.composerActions}>
+                      <div className={styles.composerSummary} aria-live="polite">
+                        {selectedSupportUser
+                          ? `Ready to send to ${selectedSupportUser.name || selectedSupportUser.email}.`
+                          : 'Select a recipient to continue.'}
+                      </div>
+                      <button
+                        className={styles.primaryButton}
+                        type="submit"
+                        disabled={supportActionId === 'send'}
+                      >
+                        {supportActionId === 'send' ? (
+                          <LoaderCircle className={styles.spin} size={16} />
+                        ) : (
+                          <Send size={16} />
+                        )}
+                        {supportActionId === 'send' ? 'Sending…' : 'Send communication'}
+                      </button>
+                    </div>
                   </form>
                 </div>
 
@@ -4001,6 +4438,11 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                                   <div className={styles.rowTitle}>
                                     {labelFromMaybeUser(message.senderId)} →{' '}
                                     {labelFromMaybeUser(message.receiverId)}
+                                    {message.senderId?.role === 'admin' ? (
+                                      <span className={`${styles.badge} ${styles.badgeSupport}`}>
+                                        {messageTypeLabel(message.messageType)}
+                                      </span>
+                                    ) : null}
                                   </div>
                                   <div className={styles.supportMessage}>{message.content}</div>
                                   <div className={styles.rowMeta}>
@@ -4087,8 +4529,8 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
               <div className={styles.panel}>
                 <div className={styles.panelHeader}>
                   <div>
-                    <h2>Platform Messages</h2>
-                    <p>Monitor, moderate, and manage cross-platform communications.</p>
+                    <h2>Messages</h2>
+                    <p>Review support conversations and moderate platform communication.</p>
                   </div>
                 </div>
                 <div className={styles.filters}>
@@ -4106,6 +4548,39 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                       <option value="all">All Messages</option>
                       <option value="true">Flagged Only</option>
                       <option value="false">Unflagged Only</option>
+                    </select>
+                  </div>
+                  <div className={styles.filterField}>
+                    <label>Message type</label>
+                    <select
+                      value={messagesFilters.type}
+                      onChange={(event) =>
+                        setMessagesFilters((current) => ({
+                          ...current,
+                          type: event.target.value,
+                        }))
+                      }
+                    >
+                      <option value="all">All types</option>
+                      <option value="support">Support</option>
+                      <option value="support_message">Support Message</option>
+                      <option value="admin_message">Admin Message</option>
+                      <option value="system_message">System Message</option>
+                    </select>
+                  </div>
+                  <div className={styles.filterField}>
+                    <label>Read state</label>
+                    <select
+                      value={messagesFilters.unreadOnly}
+                      onChange={(event) =>
+                        setMessagesFilters((current) => ({
+                          ...current,
+                          unreadOnly: event.target.value,
+                        }))
+                      }
+                    >
+                      <option value="all">All messages</option>
+                      <option value="true">Unread only</option>
                     </select>
                   </div>
                   <div className={styles.filterFieldWide}>
@@ -4141,84 +4616,26 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                 ) : (
                   <>
                     {messagesData?.summary && (
-                      <div
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr 1fr 1fr',
-                          gap: 16,
-                          padding: '0 24px 20px',
-                          borderBottom: '1px solid #E2E8F0',
-                          marginBottom: 20,
-                        }}
-                      >
-                        <div>
-                          <div
-                            style={{
-                              fontSize: 12,
-                              color: '#64748B',
-                              fontWeight: 600,
-                              textTransform: 'uppercase',
-                              marginBottom: 4,
-                            }}
-                          >
-                            Total Messages
-                          </div>
-                          <div
-                            style={{
-                              fontSize: 24,
-                              fontWeight: 900,
-                              color: '#0F172A',
-                              fontFamily: 'var(--font-display)',
-                            }}
-                          >
-                            {formatCompactNumber(messagesData.summary.totalMessages)}
-                          </div>
+                      <div className={styles.messageSummaryGrid}>
+                        <div className={styles.messageSummaryItem}>
+                          <div>Total messages</div>
+                          <strong>{formatCompactNumber(messagesData.summary.totalMessages)}</strong>
                         </div>
-                        <div>
-                          <div
-                            style={{
-                              fontSize: 12,
-                              color: '#64748B',
-                              fontWeight: 600,
-                              textTransform: 'uppercase',
-                              marginBottom: 4,
-                            }}
-                          >
-                            Flagged Alerts
-                          </div>
-                          <div
-                            style={{
-                              fontSize: 24,
-                              fontWeight: 900,
-                              color: '#9F1239',
-                              fontFamily: 'var(--font-display)',
-                            }}
-                          >
-                            {formatCompactNumber(messagesData.summary.flaggedMessages)}
-                          </div>
+                        <div className={styles.messageSummaryItem}>
+                          <div>Unread</div>
+                          <strong>
+                            {formatCompactNumber(messagesData.summary.unreadMessages)}
+                          </strong>
                         </div>
-                        <div>
-                          <div
-                            style={{
-                              fontSize: 12,
-                              color: '#64748B',
-                              fontWeight: 600,
-                              textTransform: 'uppercase',
-                              marginBottom: 4,
-                            }}
-                          >
-                            Sent Today
-                          </div>
-                          <div
-                            style={{
-                              fontSize: 24,
-                              fontWeight: 900,
-                              color: '#166534',
-                              fontFamily: 'var(--font-display)',
-                            }}
-                          >
-                            {formatCompactNumber(messagesData.summary.messagesToday)}
-                          </div>
+                        <div className={styles.messageSummaryItem}>
+                          <div>Support</div>
+                          <strong>
+                            {formatCompactNumber(messagesData.summary.supportMessages)}
+                          </strong>
+                        </div>
+                        <div className={styles.messageSummaryItem}>
+                          <div>Sent today</div>
+                          <strong>{formatCompactNumber(messagesData.summary.messagesToday)}</strong>
                         </div>
                       </div>
                     )}
@@ -4233,6 +4650,12 @@ export default function SuperAdminConsole({ currentUser }: { currentUser: Curren
                               >
                                 {labelFromMaybeUser(message.senderId)} →{' '}
                                 {labelFromMaybeUser(message.receiverId)}
+                                {message.senderId?.role === 'admin' && (
+                                  <span className={`${styles.badge} ${styles.badgeSupport}`}>
+                                    {messageTypeLabel(message.messageType)}
+                                  </span>
+                                )}
+                                <StatusBadge value={message.isRead ? 'read' : 'unread'} />
                                 {message.isFlagged && <StatusBadge value="rejected" />}
                                 {message.isDeletedForEveryone && <StatusBadge value="withdrawn" />}
                               </div>

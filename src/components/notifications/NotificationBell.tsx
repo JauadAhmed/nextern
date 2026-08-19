@@ -58,6 +58,9 @@ function typeConfig(type: string): { icon: React.ReactNode; color: string; bg: s
     interview_scheduled: { icon: <CalendarDays size={14} />, color: '#059669', bg: '#ECFDF5' },
     score_update: { icon: <TrendingUp size={14} />, color: '#6366F1', bg: '#EEF2FF' },
     message_received: { icon: <MessageSquare size={14} />, color: '#64748B', bg: '#F1F5F9' },
+    support_message: { icon: <MessageSquare size={14} />, color: '#0F766E', bg: '#F0FDFA' },
+    admin_message: { icon: <MessageSquare size={14} />, color: '#1D4ED8', bg: '#EFF6FF' },
+    system_message: { icon: <AlertCircle size={14} />, color: '#7C3AED', bg: '#F5F3FF' },
   };
   return map[type] ?? { icon: <AlertCircle size={14} />, color: '#64748B', bg: '#F1F5F9' };
 }

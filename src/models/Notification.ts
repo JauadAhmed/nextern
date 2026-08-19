@@ -16,7 +16,10 @@ export type NotificationType =
   | 'mentorship_accepted'
   | 'review_received'
   | 'freelance_order'
-  | 'payment_received';
+  | 'payment_received'
+  | 'support_message'
+  | 'admin_message'
+  | 'system_message';
 
 export interface INotification extends Document {
   userId: mongoose.Types.ObjectId;

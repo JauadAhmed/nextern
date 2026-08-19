@@ -40,6 +40,7 @@ type Message = {
   isRead: boolean;
   createdAt: string;
   templateType?: string | null;
+  messageType?: 'support_message' | 'admin_message' | 'system_message';
   editCount?: number;
   forwardedFromId?: string;
   isDeletedForEveryone?: boolean;
@@ -59,6 +60,13 @@ type Thread = {
     proposalStatus: string;
   } | null;
 };
+
+function supportMessageTypeLabel(type?: Message['messageType']) {
+  if (type === 'admin_message') return 'Admin Message';
+  if (type === 'system_message') return 'System Message';
+  if (type === 'support_message') return 'Support Message';
+  return null;
+}
 
 /* ─── Colour tokens (mirrors globals.css) ────────────────────────── */
 const C = {
@@ -1571,6 +1579,24 @@ export default function Inbox({
                           alignItems: isMe ? 'flex-end' : 'flex-start',
                         }}
                       >
+                        {supportMessageTypeLabel(msg.messageType) ? (
+                          <div
+                            style={{
+                              marginBottom: 5,
+                              padding: '3px 8px',
+                              border: `1px solid ${C.border}`,
+                              borderRadius: 999,
+                              background: C.white,
+                              color: C.gray,
+                              fontSize: 10,
+                              fontWeight: 800,
+                              letterSpacing: '0.05em',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {supportMessageTypeLabel(msg.messageType)}
+                          </div>
+                        ) : null}
                         {/* Forwarded label */}
                         {msg.forwardedFromId && (
                           <div
