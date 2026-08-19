@@ -1,5 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export type SupportMessageType = 'support_message' | 'admin_message' | 'system_message';
+
 export interface IMessage extends Document {
   senderId: mongoose.Types.ObjectId;
   receiverId: mongoose.Types.ObjectId;
@@ -10,6 +12,7 @@ export interface IMessage extends Document {
   readAt?: Date;
   isFlagged: boolean; // admin monitoring
   flagReason?: string;
+  messageType?: SupportMessageType;
   templateType?: 'interview_invite' | 'rejection' | 'offer_letter' | null;
   attachmentUrl?: string; // Legacy Uploadthing URL
   attachments?: { url: string; name: string; type: string }[];
@@ -32,6 +35,10 @@ const MessageSchema = new Schema<IMessage>(
     readAt: { type: Date },
     isFlagged: { type: Boolean, default: false },
     flagReason: { type: String },
+    messageType: {
+      type: String,
+      enum: ['support_message', 'admin_message', 'system_message'],
+    },
     templateType: {
       type: String,
       enum: ['interview_invite', 'rejection', 'offer_letter', null],

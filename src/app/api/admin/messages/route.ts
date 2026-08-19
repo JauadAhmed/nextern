@@ -22,6 +22,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const searchRegex = buildSearchRegex(searchParams.get('search'));
     const flaggedOnly = parseBooleanParam(searchParams.get('flaggedOnly'));
+    const unreadOnly = parseBooleanParam(searchParams.get('unreadOnly'));
+    const type = searchParams.get('type');
     const { limit } = parsePagination(searchParams, { defaultLimit: 20, maxLimit: 100 });
 
     await connectDB();
@@ -40,6 +42,14 @@ export async function GET(req: NextRequest) {
     const messageQuery: Record<string, unknown> = {};
 
     if (typeof flaggedOnly === 'boolean') messageQuery.isFlagged = flaggedOnly;
+    if (unreadOnly === true) messageQuery.isRead = false;
+
+    if (type === 'support') {
+      const adminIds = await User.find({ role: 'admin' }).distinct('_id');
+      messageQuery.senderId = { $in: adminIds };
+    } else if (['support_message', 'admin_message', 'system_message'].includes(type ?? '')) {
+      messageQuery.messageType = type;
+    }
 
     if (searchRegex) {
       messageQuery.$or = [
@@ -54,16 +64,27 @@ export async function GET(req: NextRequest) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const [messages, totalMessages, flaggedMessages, messagesToday] = await Promise.all([
+    const [
+      messages,
+      totalMessages,
+      flaggedMessages,
+      messagesToday,
+      unreadMessages,
+      supportMessages,
+    ] = await Promise.all([
       Message.find(messageQuery)
-        .populate('senderId', 'name email role companyName image')
-        .populate('receiverId', 'name email role companyName image')
+        .populate('senderId', 'name email role companyName image university studentId')
+        .populate('receiverId', 'name email role companyName image university studentId')
         .sort({ createdAt: -1 })
         .limit(limit)
         .lean(),
       Message.countDocuments({}),
       Message.countDocuments({ isFlagged: true }),
       Message.countDocuments({ createdAt: { $gte: today } }),
+      Message.countDocuments({ isRead: false }),
+      User.find({ role: 'admin' })
+        .distinct('_id')
+        .then((adminIds) => Message.countDocuments({ senderId: { $in: adminIds } })),
     ]);
 
     return NextResponse.json({
@@ -72,6 +93,8 @@ export async function GET(req: NextRequest) {
         totalMessages,
         flaggedMessages,
         messagesToday,
+        unreadMessages,
+        supportMessages,
       },
     });
   } catch (error) {

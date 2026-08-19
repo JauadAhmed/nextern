@@ -18,4 +18,5 @@ export function userChannel(userId: string): string {
 export const PUSHER_EVENTS = {
   NEW_NOTIFICATION: 'new-notification',
   NOTIFICATION_READ: 'notification-read',
+  NEW_MESSAGE: 'new-message',
 } as const;

@@ -155,6 +155,27 @@ const DEFAULT_TYPE_CONFIG: Record<
     border: '#E2E8F0',
     label: 'Message',
   },
+  support_message: {
+    icon: <MessageSquare size={15} />,
+    color: '#0F766E',
+    bg: '#F0FDFA',
+    border: '#99F6E4',
+    label: 'Support Message',
+  },
+  admin_message: {
+    icon: <MessageSquare size={15} />,
+    color: '#1D4ED8',
+    bg: '#EFF6FF',
+    border: '#BFDBFE',
+    label: 'Admin Message',
+  },
+  system_message: {
+    icon: <AlertCircle size={15} />,
+    color: '#7C3AED',
+    bg: '#F5F3FF',
+    border: '#DDD6FE',
+    label: 'System Message',
+  },
 };
 
 function typeConfig(type: string) {
