@@ -6,7 +6,7 @@ import {
   type AIResult,
 } from '@/lib/ai-meta';
 
-const GROQ_MODEL = 'llama-3.1-8b-instant';
+const GROQ_MODEL = 'openai/gpt-oss-20b';
 const LOCAL_INTERVIEW_MODEL = 'local-interview-mode';
 const LOCAL_FEEDBACK_MODEL = 'local-interview-feedback';
 
@@ -26,7 +26,7 @@ async function askGroq(messages: GroqMessage[]): Promise<string> {
     model: GROQ_MODEL,
     messages,
     temperature: 0.7,
-    max_tokens: 1024,
+    max_completion_tokens: 1024,
   });
 
   const content = response.choices[0].message.content?.trim() ?? '';
